@@ -5,9 +5,12 @@ import 'package:forma/core/services/daily_summary_service.dart';
 import 'package:forma/core/services/health_connect_service.dart';
 import 'package:forma/data/models/daily_summary_model.dart';
 import 'package:forma/data/models/workout_model.dart';
+import 'package:forma/data/models/workout_session_model.dart';
 import 'package:forma/data/repositories/workout_repository.dart';
 import 'package:forma/data/repositories/nutrition_repository.dart';
 import 'package:forma/data/repositories/habit_repository.dart';
+import 'package:forma/data/models/habit.dart';
+import 'package:forma/data/models/nutrition_model.dart';
 
 final dailySummaryServiceProvider = Provider<DailySummaryService>((ref) {
   return DailySummaryService();
@@ -78,52 +81,74 @@ class DailySummaryRepository {
 final todaySummaryProvider = FutureProvider<DailySummary>((ref) async {
   final summaryService = ref.watch(dailySummaryServiceProvider);
   final repo = ref.watch(dailySummaryRepositoryProvider);
-  final history = await ref.watch(workoutRepositoryProvider).getHistory();
-  final meals = await ref.watch(todayMealsProvider.future);
-  final habits = await ref.watch(habitsListProvider.future);
-  final habitStatus = ref.watch(habitStatusProvider);
   final user = FirebaseAuth.instance.currentUser;
-
-  // Genuine completed workouts for today only
   final now = DateTime.now();
-  final todaySessions = history.where((s) {
-    return s.startTime.year == now.year &&
-        s.startTime.month == now.month &&
-        s.startTime.day == now.day;
-  }).toList();
 
-  final List<WorkoutModel> completedWorkoutModels = todaySessions.map((s) {
-    return WorkoutModel(
-      id: s.id,
-      userId: s.userId,
-      name: s.workoutName,
-      targetMuscleGroups: [],
-      exercises: [],
-      estimatedDurationMinutes: s.duration.inMinutes,
-      createdAt: s.startTime,
+  try {
+    final history = await ref
+        .watch(workoutRepositoryProvider)
+        .getHistory()
+        .catchError((_) => <WorkoutSessionModel>[]);
+    final meals = await ref
+        .watch(todayMealsProvider.future)
+        .catchError((_) => <MealEntry>[]);
+    final habits =
+        await ref.watch(habitsListProvider.future).catchError((_) => <Habit>[]);
+    final habitStatus = ref.watch(habitStatusProvider);
+
+    // Genuine completed workouts for today only
+    final todaySessions = history.where((s) {
+      return s.startTime.year == now.year &&
+          s.startTime.month == now.month &&
+          s.startTime.day == now.day;
+    }).toList();
+
+    final List<WorkoutModel> completedWorkoutModels = todaySessions.map((s) {
+      return WorkoutModel(
+        id: s.id,
+        userId: s.userId,
+        name: s.workoutName,
+        targetMuscleGroups: [],
+        exercises: [],
+        estimatedDurationMinutes: s.duration.inMinutes,
+        createdAt: s.startTime,
+      );
+    }).toList();
+
+    // Fetch verified Health Connect metrics if authorized (with fast timeout so it never blocks Home render)
+    final healthMetrics = await HealthConnectService()
+        .fetchDailyMetrics(now)
+        .timeout(const Duration(milliseconds: 1200),
+            onTimeout: () => DailyHealthMetrics(timestamp: now))
+        .catchError((_) => DailyHealthMetrics(timestamp: now));
+
+    final summary = summaryService.generateSummary(
+      completedWorkouts: completedWorkoutModels,
+      loggedMeals: meals,
+      habits: habits,
+      habitCompletion: habitStatus,
+      userName: user?.displayName ?? 'Athlete',
+      steps: healthMetrics.steps,
+      activeCalories: healthMetrics.activeCalories,
+      heartRateBpm: healthMetrics.heartRateBpm,
     );
-  }).toList();
 
-  // Fetch verified Health Connect metrics if authorized
-  final healthMetrics = await HealthConnectService().fetchDailyMetrics(now);
+    // Asynchronously persist / reconcile to Firestore dailySummaries
+    if (user != null) {
+      repo.saveDailySummary(summary).ignore();
+    }
 
-  final summary = summaryService.generateSummary(
-    completedWorkouts: completedWorkoutModels,
-    loggedMeals: meals,
-    habits: habits,
-    habitCompletion: habitStatus,
-    userName: user?.displayName ?? 'Athlete',
-    steps: healthMetrics.steps,
-    activeCalories: healthMetrics.activeCalories,
-    heartRateBpm: healthMetrics.heartRateBpm,
-  );
-
-  // Asynchronously persist / reconcile to Firestore dailySummaries
-  if (user != null) {
-    repo.saveDailySummary(summary).ignore();
+    return summary;
+  } catch (_) {
+    // Return honest initial summary on fresh login or offline network latency
+    return summaryService.generateSummary(
+      completedWorkouts: [],
+      loggedMeals: [],
+      habits: [],
+      habitCompletion: {},
+      userName: user?.displayName ?? 'Athlete',
+    );
   }
-
-  return summary;
 });
 
 final recentDailySummariesProvider = StreamProvider<List<DailySummary>>((ref) {

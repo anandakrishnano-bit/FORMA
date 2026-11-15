@@ -153,6 +153,7 @@ class FormaButton extends StatelessWidget {
         child = Row(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Icon(icon, size: _fontSize + 4, color: fgColor),
             const SizedBox(width: 6),
@@ -160,7 +161,11 @@ class FormaButton extends StatelessWidget {
           ],
         );
       } else {
-        child = labelWidget;
+        child = Center(
+          widthFactor: 1.0,
+          heightFactor: 1.0,
+          child: labelWidget,
+        );
       }
     }
 

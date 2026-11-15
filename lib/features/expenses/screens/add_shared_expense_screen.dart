@@ -321,681 +321,695 @@ class _AddSharedExpenseScreenState
         ],
       ),
       body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (_errorMessage != null) ...[
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        margin: const EdgeInsets.only(bottom: 16),
-                        decoration: BoxDecoration(
-                          color: FormaColors.coralPink.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: FormaColors.coralPink),
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.error_outline_rounded,
-                                color: FormaColors.coralPink, size: 20),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                _errorMessage!,
-                                style: const TextStyle(
-                                    color: FormaColors.coralPink,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w600),
+        child: GestureDetector(
+          onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+          behavior: HitTestBehavior.translucent,
+          child: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (_errorMessage != null) ...[
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          margin: const EdgeInsets.only(bottom: 16),
+                          decoration: BoxDecoration(
+                            color:
+                                FormaColors.coralPink.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(color: FormaColors.coralPink),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.error_outline_rounded,
+                                  color: FormaColors.coralPink, size: 20),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  _errorMessage!,
+                                  style: const TextStyle(
+                                      color: FormaColors.coralPink,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600),
+                                ),
                               ),
+                            ],
+                          ),
+                        ),
+                      ],
+
+                      // 1. Featured Amount Card
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 24, horizontal: 20),
+                        decoration: BoxDecoration(
+                          color: cardBg,
+                          borderRadius: BorderRadius.circular(28),
+                          border: Border.all(
+                            color: isDark
+                                ? Colors.white10
+                                : FormaColors.divider.withValues(alpha: 0.6),
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black
+                                  .withValues(alpha: isDark ? 0.25 : 0.04),
+                              blurRadius: 16,
+                              offset: const Offset(0, 6),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              'SHARED EXPENSE TOTAL',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 1.5,
+                                color: secondaryTextColor,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            ValueListenableBuilder<String>(
+                              valueListenable: _amountNotifier,
+                              builder: (context, value, _) {
+                                final displayAmount =
+                                    value.isEmpty ? '0' : value;
+                                return Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.baseline,
+                                  textBaseline: TextBaseline.alphabetic,
+                                  children: [
+                                    Text(
+                                      '₹',
+                                      style: GoogleFonts.plusJakartaSans(
+                                        fontSize: 32,
+                                        fontWeight: FontWeight.w700,
+                                        color: FormaColors.goldenYellow,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      displayAmount,
+                                      style: GoogleFonts.plusJakartaSans(
+                                        fontSize: 50,
+                                        fontWeight: FontWeight.w900,
+                                        letterSpacing: -1.2,
+                                        color: value.isEmpty
+                                            ? secondaryTextColor.withValues(
+                                                alpha: 0.5)
+                                            : primaryTextColor,
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
                             ),
                           ],
                         ),
                       ),
-                    ],
 
-                    // 1. Featured Amount Card
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 24, horizontal: 20),
-                      decoration: BoxDecoration(
-                        color: cardBg,
-                        borderRadius: BorderRadius.circular(28),
-                        border: Border.all(
-                          color: isDark
-                              ? Colors.white10
-                              : FormaColors.divider.withValues(alpha: 0.6),
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black
-                                .withValues(alpha: isDark ? 0.25 : 0.04),
-                            blurRadius: 16,
-                            offset: const Offset(0, 6),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Text(
-                            'SHARED EXPENSE TOTAL',
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 1.5,
-                              color: secondaryTextColor,
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          ValueListenableBuilder<String>(
-                            valueListenable: _amountNotifier,
-                            builder: (context, value, _) {
-                              final displayAmount = value.isEmpty ? '0' : value;
-                              return Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.baseline,
-                                textBaseline: TextBaseline.alphabetic,
-                                children: [
-                                  Text(
-                                    '₹',
-                                    style: GoogleFonts.plusJakartaSans(
-                                      fontSize: 32,
-                                      fontWeight: FontWeight.w700,
-                                      color: FormaColors.goldenYellow,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    displayAmount,
-                                    style: GoogleFonts.plusJakartaSans(
-                                      fontSize: 50,
-                                      fontWeight: FontWeight.w900,
-                                      letterSpacing: -1.2,
-                                      color: value.isEmpty
-                                          ? secondaryTextColor.withValues(
-                                              alpha: 0.5)
-                                          : primaryTextColor,
-                                    ),
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
+                      const SizedBox(height: 18),
 
-                    const SizedBox(height: 18),
-
-                    // 2. Title field
-                    Text(
-                      'Expense Title',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w800,
-                        color: primaryTextColor,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: _titleController,
-                      style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: primaryTextColor),
-                      decoration: InputDecoration(
-                        hintText: 'e.g. Dinner, Taxi fare, Groceries',
-                        hintStyle: TextStyle(
-                            color: secondaryTextColor.withValues(alpha: 0.6)),
-                        prefixIcon: const Icon(Icons.receipt_rounded,
-                            color: FormaColors.primaryAccent),
-                        filled: true,
-                        fillColor: cardBg,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(18),
-                          borderSide: BorderSide(
-                              color: isDark
-                                  ? Colors.white10
-                                  : FormaColors.divider),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(18),
-                          borderSide: BorderSide(
-                              color: isDark
-                                  ? Colors.white10
-                                  : FormaColors.divider),
+                      // 2. Title field
+                      Text(
+                        'Expense Title',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w800,
+                          color: primaryTextColor,
                         ),
                       ),
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // 3. Paid By Selector
-                    Text(
-                      'Who Paid?',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w800,
-                        color: primaryTextColor,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      physics: const BouncingScrollPhysics(),
-                      child: Row(
-                        children: _selectedParticipants.map((p) {
-                          final isPayer = _payerUid == p.uid;
-                          return Padding(
-                            padding: const EdgeInsets.only(right: 8),
-                            child: FormaBounceable(
-                              onTap: () => setState(() => _payerUid = p.uid),
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 160),
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 14, vertical: 8),
-                                decoration: BoxDecoration(
-                                  color: isPayer
-                                      ? FormaColors.primaryAccent
-                                      : cardBg,
-                                  borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(
-                                    color: isPayer
-                                        ? FormaColors.primaryAccent
-                                        : (isDark
-                                            ? Colors.white10
-                                            : FormaColors.divider),
-                                  ),
-                                ),
-                                child: Text(
-                                  p.uid == _currentUserUid ? 'You' : p.name,
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    fontWeight: isPayer
-                                        ? FontWeight.w800
-                                        : FontWeight.w600,
-                                    color: isPayer
-                                        ? FormaColors.charcoal
-                                        : primaryTextColor,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // 4. Participants Selection (Friends)
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Participants (${_selectedParticipants.length})',
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w800,
-                            color: primaryTextColor,
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: _titleController,
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: primaryTextColor),
+                        decoration: InputDecoration(
+                          hintText: 'e.g. Dinner, Taxi fare, Groceries',
+                          hintStyle: TextStyle(
+                              color: secondaryTextColor.withValues(alpha: 0.6)),
+                          prefixIcon: const Icon(Icons.receipt_rounded,
+                              color: FormaColors.primaryAccent),
+                          filled: true,
+                          fillColor: cardBg,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(18),
+                            borderSide: BorderSide(
+                                color: isDark
+                                    ? Colors.white10
+                                    : FormaColors.divider),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(18),
+                            borderSide: BorderSide(
+                                color: isDark
+                                    ? Colors.white10
+                                    : FormaColors.divider),
                           ),
                         ),
-                        Text(
-                          'Tap to add/remove',
-                          style: TextStyle(
-                              fontSize: 12, color: secondaryTextColor),
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      // 3. Paid By Selector
+                      Text(
+                        'Who Paid?',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w800,
+                          color: primaryTextColor,
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    friendsAsync.when(
-                      data: (friends) {
-                        return Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: [
-                            // Current user badge (always selected)
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 8),
-                              decoration: BoxDecoration(
-                                color: FormaColors.primaryAccent
-                                    .withValues(alpha: 0.2),
-                                borderRadius: BorderRadius.circular(14),
-                                border: Border.all(
-                                    color: FormaColors.primaryAccent),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(Icons.check_rounded,
-                                      size: 16,
-                                      color: FormaColors.primaryAccent),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    'You',
-                                    style: TextStyle(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w700,
-                                        color: primaryTextColor),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            // Confirmed friends
-                            ...friends.map((friend) {
-                              final isSelected = _selectedParticipants
-                                  .any((p) => p.uid == friend.userId);
-                              return FormaBounceable(
-                                onTap: () => _toggleParticipant((
-                                  uid: friend.userId,
-                                  name: friend.displayName,
-                                  photoUrl: null,
-                                )),
+                      ),
+                      const SizedBox(height: 8),
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        physics: const BouncingScrollPhysics(),
+                        child: Row(
+                          children: _selectedParticipants.map((p) {
+                            final isPayer = _payerUid == p.uid;
+                            return Padding(
+                              padding: const EdgeInsets.only(right: 8),
+                              child: FormaBounceable(
+                                onTap: () => setState(() => _payerUid = p.uid),
                                 child: AnimatedContainer(
-                                  duration: const Duration(milliseconds: 150),
+                                  duration: const Duration(milliseconds: 160),
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal: 12, vertical: 8),
+                                      horizontal: 14, vertical: 8),
                                   decoration: BoxDecoration(
-                                    color: isSelected
+                                    color: isPayer
                                         ? FormaColors.primaryAccent
-                                            .withValues(alpha: 0.25)
                                         : cardBg,
-                                    borderRadius: BorderRadius.circular(14),
+                                    borderRadius: BorderRadius.circular(16),
                                     border: Border.all(
-                                      color: isSelected
+                                      color: isPayer
                                           ? FormaColors.primaryAccent
                                           : (isDark
                                               ? Colors.white10
                                               : FormaColors.divider),
                                     ),
                                   ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(
-                                        isSelected
-                                            ? Icons.check_circle_rounded
-                                            : Icons.add_circle_outline_rounded,
-                                        size: 16,
-                                        color: isSelected
-                                            ? FormaColors.primaryAccent
-                                            : secondaryTextColor,
-                                      ),
-                                      const SizedBox(width: 6),
-                                      Text(
-                                        friend.displayName,
-                                        style: TextStyle(
-                                          fontSize: 13,
-                                          fontWeight: isSelected
-                                              ? FontWeight.w700
-                                              : FontWeight.w500,
-                                          color: isSelected
-                                              ? primaryTextColor
-                                              : secondaryTextColor,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            }),
-                          ],
-                        );
-                      },
-                      loading: () => const SizedBox(
-                          height: 20, child: LinearProgressIndicator()),
-                      error: (_, __) => const SizedBox.shrink(),
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // 5. Split Method Selector: Equal, Custom, Percentage
-                    Text(
-                      'Split Method',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w800,
-                        color: primaryTextColor,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: cardBg,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(
-                            color:
-                                isDark ? Colors.white10 : FormaColors.divider),
-                      ),
-                      child: Row(
-                        children: SplitMethod.values.map((method) {
-                          final isSel = _splitMethod == method;
-                          final label = method == SplitMethod.equal
-                              ? 'Equal Split'
-                              : (method == SplitMethod.custom
-                                  ? 'Custom'
-                                  : 'Percentage');
-                          return Expanded(
-                            child: GestureDetector(
-                              onTap: () =>
-                                  setState(() => _splitMethod = method),
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 160),
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 10),
-                                decoration: BoxDecoration(
-                                  color: isSel
-                                      ? FormaColors.primaryAccent
-                                      : Colors.transparent,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Center(
                                   child: Text(
-                                    label,
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: isSel
-                                          ? FontWeight.w800
-                                          : FontWeight.w600,
-                                      color: isSel
-                                          ? FormaColors.charcoal
-                                          : secondaryTextColor,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // 6. Split Input & Calculated Shares
-                    if (_splitMethod == SplitMethod.equal) ...[
-                      // Equal split summary card
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: cardBg,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                              color: isDark
-                                  ? Colors.white10
-                                  : FormaColors.divider),
-                        ),
-                        child: Column(
-                          children: _selectedParticipants.map((p) {
-                            final count = _selectedParticipants.length;
-                            final share =
-                                count > 0 ? (totalAmount / count) : 0.0;
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 6),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
                                     p.uid == _currentUserUid ? 'You' : p.name,
                                     style: TextStyle(
-                                        fontWeight: FontWeight.w700,
-                                        color: primaryTextColor),
-                                  ),
-                                  Text(
-                                    '₹${share.toStringAsFixed(share.truncateToDouble() == share ? 0 : 2)}',
-                                    style: GoogleFonts.plusJakartaSans(
-                                      fontWeight: FontWeight.w800,
-                                      fontSize: 15,
-                                      color: FormaColors.primaryAccent,
+                                      fontSize: 13,
+                                      fontWeight: isPayer
+                                          ? FontWeight.w800
+                                          : FontWeight.w600,
+                                      color: isPayer
+                                          ? FormaColors.charcoal
+                                          : primaryTextColor,
                                     ),
                                   ),
-                                ],
+                                ),
                               ),
                             );
                           }).toList(),
                         ),
                       ),
-                    ] else if (_splitMethod == SplitMethod.custom) ...[
-                      // Custom split input fields
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: cardBg,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                              color: isDark
-                                  ? Colors.white10
-                                  : FormaColors.divider),
-                        ),
-                        child: Column(
-                          children: _selectedParticipants.map((p) {
-                            final ctrl = _getCustomController(p.uid);
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 6),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      p.uid == _currentUserUid ? 'You' : p.name,
+
+                      const SizedBox(height: 20),
+
+                      // 4. Participants Selection (Friends)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Participants (${_selectedParticipants.length})',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w800,
+                              color: primaryTextColor,
+                            ),
+                          ),
+                          Text(
+                            'Tap to add/remove',
+                            style: TextStyle(
+                                fontSize: 12, color: secondaryTextColor),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      friendsAsync.when(
+                        data: (friends) {
+                          return Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: [
+                              // Current user badge (always selected)
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 8),
+                                decoration: BoxDecoration(
+                                  color: FormaColors.primaryAccent
+                                      .withValues(alpha: 0.2),
+                                  borderRadius: BorderRadius.circular(14),
+                                  border: Border.all(
+                                      color: FormaColors.primaryAccent),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(Icons.check_rounded,
+                                        size: 16,
+                                        color: FormaColors.primaryAccent),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      'You',
                                       style: TextStyle(
+                                          fontSize: 13,
                                           fontWeight: FontWeight.w700,
                                           color: primaryTextColor),
                                     ),
-                                  ),
-                                  SizedBox(
-                                    width: 120,
-                                    child: TextField(
-                                      controller: ctrl,
-                                      keyboardType:
-                                          const TextInputType.numberWithOptions(
-                                              decimal: true),
-                                      onChanged: (_) => setState(() {}),
-                                      decoration: InputDecoration(
-                                        prefixText: '₹ ',
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                                horizontal: 10, vertical: 8),
-                                        border: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10)),
+                                  ],
+                                ),
+                              ),
+                              // Confirmed friends
+                              ...friends.map((friend) {
+                                final isSelected = _selectedParticipants
+                                    .any((p) => p.uid == friend.userId);
+                                return FormaBounceable(
+                                  onTap: () => _toggleParticipant((
+                                    uid: friend.userId,
+                                    name: friend.displayName,
+                                    photoUrl: null,
+                                  )),
+                                  child: AnimatedContainer(
+                                    duration: const Duration(milliseconds: 150),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 12, vertical: 8),
+                                    decoration: BoxDecoration(
+                                      color: isSelected
+                                          ? FormaColors.primaryAccent
+                                              .withValues(alpha: 0.25)
+                                          : cardBg,
+                                      borderRadius: BorderRadius.circular(14),
+                                      border: Border.all(
+                                        color: isSelected
+                                            ? FormaColors.primaryAccent
+                                            : (isDark
+                                                ? Colors.white10
+                                                : FormaColors.divider),
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                    ] else ...[
-                      // Percentage split input fields
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: cardBg,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                              color: isDark
-                                  ? Colors.white10
-                                  : FormaColors.divider),
-                        ),
-                        child: Column(
-                          children: _selectedParticipants.map((p) {
-                            final ctrl = _getPercentageController(p.uid);
-                            final pct =
-                                double.tryParse(ctrl.text.trim()) ?? 0.0;
-                            final calcShare = (totalAmount * pct) / 100.0;
-
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 6),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        Text(
-                                          p.uid == _currentUserUid
-                                              ? 'You'
-                                              : p.name,
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w700,
-                                              color: primaryTextColor),
+                                        Icon(
+                                          isSelected
+                                              ? Icons.check_circle_rounded
+                                              : Icons
+                                                  .add_circle_outline_rounded,
+                                          size: 16,
+                                          color: isSelected
+                                              ? FormaColors.primaryAccent
+                                              : secondaryTextColor,
                                         ),
+                                        const SizedBox(width: 6),
                                         Text(
-                                          '₹${calcShare.toStringAsFixed(2)}',
-                                          style: const TextStyle(
-                                              fontSize: 12,
-                                              color: FormaColors.primaryAccent),
+                                          friend.displayName,
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: isSelected
+                                                ? FontWeight.w700
+                                                : FontWeight.w500,
+                                            color: isSelected
+                                                ? primaryTextColor
+                                                : secondaryTextColor,
+                                          ),
                                         ),
                                       ],
                                     ),
                                   ),
-                                  SizedBox(
-                                    width: 100,
-                                    child: TextField(
-                                      controller: ctrl,
-                                      keyboardType:
-                                          const TextInputType.numberWithOptions(
-                                              decimal: true),
-                                      onChanged: (_) => setState(() {}),
-                                      decoration: InputDecoration(
-                                        suffixText: '%',
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                                horizontal: 10, vertical: 8),
-                                        border: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10)),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          }).toList(),
+                                );
+                              }),
+                            ],
+                          );
+                        },
+                        loading: () => const SizedBox(
+                            height: 20, child: LinearProgressIndicator()),
+                        error: (_, __) => const SizedBox.shrink(),
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      // 5. Split Method Selector: Equal, Custom, Percentage
+                      Text(
+                        'Split Method',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w800,
+                          color: primaryTextColor,
                         ),
                       ),
-                    ],
-
-                    const SizedBox(height: 20),
-
-                    // 7. Date & Optional Note
-                    Text(
-                      'Date',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w800,
-                        color: primaryTextColor,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    FormaBounceable(
-                      onTap: _selectDate,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 14),
+                      const SizedBox(height: 8),
+                      Container(
+                        padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
                           color: cardBg,
-                          borderRadius: BorderRadius.circular(18),
+                          borderRadius: BorderRadius.circular(16),
                           border: Border.all(
                               color: isDark
                                   ? Colors.white10
                                   : FormaColors.divider),
                         ),
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                const Icon(Icons.calendar_today_rounded,
-                                    size: 20, color: FormaColors.primaryAccent),
-                                const SizedBox(width: 12),
-                                Text(
-                                  '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
-                                  style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w700,
-                                      color: primaryTextColor),
+                          children: SplitMethod.values.map((method) {
+                            final isSel = _splitMethod == method;
+                            final label = method == SplitMethod.equal
+                                ? 'Equal Split'
+                                : (method == SplitMethod.custom
+                                    ? 'Custom'
+                                    : 'Percentage');
+                            return Expanded(
+                              child: GestureDetector(
+                                onTap: () =>
+                                    setState(() => _splitMethod = method),
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 160),
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 10),
+                                  decoration: BoxDecoration(
+                                    color: isSel
+                                        ? FormaColors.primaryAccent
+                                        : Colors.transparent,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      label,
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: isSel
+                                            ? FontWeight.w800
+                                            : FontWeight.w600,
+                                        color: isSel
+                                            ? FormaColors.charcoal
+                                            : secondaryTextColor,
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                              ],
-                            ),
-                            Icon(Icons.arrow_forward_ios_rounded,
-                                size: 14, color: secondaryTextColor),
-                          ],
+                              ),
+                            );
+                          }).toList(),
                         ),
                       ),
-                    ),
 
-                    const SizedBox(height: 20),
+                      const SizedBox(height: 16),
 
-                    Text(
-                      'Optional Note',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w800,
-                        color: primaryTextColor,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: _noteController,
-                      maxLines: 2,
-                      style: TextStyle(fontSize: 14, color: primaryTextColor),
-                      decoration: InputDecoration(
-                        hintText: 'e.g. Split equally for team dinner',
-                        hintStyle: TextStyle(
-                            color: secondaryTextColor.withValues(alpha: 0.6)),
-                        filled: true,
-                        fillColor: cardBg,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(18),
-                          borderSide: BorderSide(
-                              color: isDark
-                                  ? Colors.white10
-                                  : FormaColors.divider),
+                      // 6. Split Input & Calculated Shares
+                      if (_splitMethod == SplitMethod.equal) ...[
+                        // Equal split summary card
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: cardBg,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                                color: isDark
+                                    ? Colors.white10
+                                    : FormaColors.divider),
+                          ),
+                          child: Column(
+                            children: _selectedParticipants.map((p) {
+                              final count = _selectedParticipants.length;
+                              final share =
+                                  count > 0 ? (totalAmount / count) : 0.0;
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 6),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      p.uid == _currentUserUid ? 'You' : p.name,
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w700,
+                                          color: primaryTextColor),
+                                    ),
+                                    Text(
+                                      '₹${share.toStringAsFixed(share.truncateToDouble() == share ? 0 : 2)}',
+                                      style: GoogleFonts.plusJakartaSans(
+                                        fontWeight: FontWeight.w800,
+                                        fontSize: 15,
+                                        color: FormaColors.primaryAccent,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ] else if (_splitMethod == SplitMethod.custom) ...[
+                        // Custom split input fields
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: cardBg,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                                color: isDark
+                                    ? Colors.white10
+                                    : FormaColors.divider),
+                          ),
+                          child: Column(
+                            children: _selectedParticipants.map((p) {
+                              final ctrl = _getCustomController(p.uid);
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 6),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        p.uid == _currentUserUid
+                                            ? 'You'
+                                            : p.name,
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w700,
+                                            color: primaryTextColor),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: 120,
+                                      child: TextField(
+                                        controller: ctrl,
+                                        keyboardType: const TextInputType
+                                            .numberWithOptions(decimal: true),
+                                        onChanged: (_) => setState(() {}),
+                                        decoration: InputDecoration(
+                                          prefixText: '₹ ',
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                  horizontal: 10, vertical: 8),
+                                          border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10)),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ] else ...[
+                        // Percentage split input fields
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: cardBg,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                                color: isDark
+                                    ? Colors.white10
+                                    : FormaColors.divider),
+                          ),
+                          child: Column(
+                            children: _selectedParticipants.map((p) {
+                              final ctrl = _getPercentageController(p.uid);
+                              final pct =
+                                  double.tryParse(ctrl.text.trim()) ?? 0.0;
+                              final calcShare = (totalAmount * pct) / 100.0;
+
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 6),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            p.uid == _currentUserUid
+                                                ? 'You'
+                                                : p.name,
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w700,
+                                                color: primaryTextColor),
+                                          ),
+                                          Text(
+                                            '₹${calcShare.toStringAsFixed(2)}',
+                                            style: const TextStyle(
+                                                fontSize: 12,
+                                                color:
+                                                    FormaColors.primaryAccent),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: 100,
+                                      child: TextField(
+                                        controller: ctrl,
+                                        keyboardType: const TextInputType
+                                            .numberWithOptions(decimal: true),
+                                        onChanged: (_) => setState(() {}),
+                                        decoration: InputDecoration(
+                                          suffixText: '%',
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                  horizontal: 10, vertical: 8),
+                                          border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(10)),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ],
+
+                      const SizedBox(height: 20),
+
+                      // 7. Date & Optional Note
+                      Text(
+                        'Date',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w800,
+                          color: primaryTextColor,
                         ),
                       ),
-                    ),
+                      const SizedBox(height: 8),
+                      FormaBounceable(
+                        onTap: _selectDate,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 14),
+                          decoration: BoxDecoration(
+                            color: cardBg,
+                            borderRadius: BorderRadius.circular(18),
+                            border: Border.all(
+                                color: isDark
+                                    ? Colors.white10
+                                    : FormaColors.divider),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  const Icon(Icons.calendar_today_rounded,
+                                      size: 20,
+                                      color: FormaColors.primaryAccent),
+                                  const SizedBox(width: 12),
+                                  Text(
+                                    '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w700,
+                                        color: primaryTextColor),
+                                  ),
+                                ],
+                              ),
+                              Icon(Icons.arrow_forward_ios_rounded,
+                                  size: 14, color: secondaryTextColor),
+                            ],
+                          ),
+                        ),
+                      ),
 
-                    const SizedBox(height: 24),
-                  ],
+                      const SizedBox(height: 20),
+
+                      Text(
+                        'Optional Note',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w800,
+                          color: primaryTextColor,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: _noteController,
+                        maxLines: 2,
+                        style: TextStyle(fontSize: 14, color: primaryTextColor),
+                        decoration: InputDecoration(
+                          hintText: 'e.g. Split equally for team dinner',
+                          hintStyle: TextStyle(
+                              color: secondaryTextColor.withValues(alpha: 0.6)),
+                          filled: true,
+                          fillColor: cardBg,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(18),
+                            borderSide: BorderSide(
+                                color: isDark
+                                    ? Colors.white10
+                                    : FormaColors.divider),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 24),
+                    ],
+                  ),
                 ),
               ),
-            ),
 
-            // Keypad
-            if (_useCustomKeypad)
-              CustomNumericKeypad(
-                amountNotifier: _amountNotifier,
-                isDark: isDark,
-                showDoneButton: false,
-                onSwitchToSystemKeyboard: () {
-                  setState(() => _useCustomKeypad = false);
-                },
-              )
-            else
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                child: TextButton.icon(
-                  icon: const Icon(Icons.dialpad_rounded),
-                  label: const Text('Switch back to tactile numeric keypad'),
-                  onPressed: () => setState(() => _useCustomKeypad = true),
+              // Keypad
+              if (_useCustomKeypad)
+                CustomNumericKeypad(
+                  amountNotifier: _amountNotifier,
+                  isDark: isDark,
+                  showDoneButton: false,
+                  onSwitchToSystemKeyboard: () {
+                    setState(() => _useCustomKeypad = false);
+                  },
+                )
+              else
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: TextButton.icon(
+                    icon: const Icon(Icons.dialpad_rounded),
+                    label: const Text('Switch back to tactile numeric keypad'),
+                    onPressed: () => setState(() => _useCustomKeypad = true),
+                  ),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
       ),
     );

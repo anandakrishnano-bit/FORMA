@@ -86,6 +86,7 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       final userDocRef = _firestore.collection('users').doc(user.uid);
       final doc = await userDocRef.get();
+      final isExistingUser = !_isRegisterMode;
 
       if (!doc.exists) {
         final displayName =
@@ -101,13 +102,20 @@ class _LoginScreenState extends State<LoginScreen> {
           'photoURL': user.photoURL ?? '',
           'createdAt': FieldValue.serverTimestamp(),
           'updatedAt': FieldValue.serverTimestamp(),
-          'onboardingCompleted': false,
+          'onboardingComplete': isExistingUser,
+          'onboardingCompleted': isExistingUser,
           'preferredAuthProviders':
               user.providerData.map((p) => p.providerId).toList(),
           'accountStatus': 'active',
         });
 
-        if (mounted) context.go('/onboarding-flow');
+        if (mounted) {
+          if (isExistingUser) {
+            context.go('/home');
+          } else {
+            context.go('/onboarding-flow');
+          }
+        }
       } else {
         // Preserve existing profile; merge only timestamp and provider metadata
         await userDocRef.set({
@@ -116,8 +124,13 @@ class _LoginScreenState extends State<LoginScreen> {
               user.providerData.map((p) => p.providerId).toList(),
         }, SetOptions(merge: true));
 
-        final isComplete =
-            (doc.data()?['onboardingCompleted'] as bool?) ?? false;
+        final data = doc.data() ?? {};
+        // Check both onboardingComplete and onboardingCompleted flags.
+        // Existing registered users who sign in must always enter directly to Home.
+        final isComplete = (data['onboardingComplete'] as bool?) ??
+            (data['onboardingCompleted'] as bool?) ??
+            isExistingUser;
+
         if (mounted) {
           if (isComplete) {
             context.go('/home');
@@ -128,7 +141,13 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     } catch (e) {
       // In case of offline or Firestore rule latency, route directly
-      if (mounted) context.go('/home');
+      if (mounted) {
+        if (!_isRegisterMode) {
+          context.go('/home');
+        } else {
+          context.go('/onboarding-flow');
+        }
+      }
     }
   }
 

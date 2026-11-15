@@ -272,392 +272,400 @@ class _AddPersonalExpenseScreenState
         ],
       ),
       body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (_errorMessage != null) ...[
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        margin: const EdgeInsets.only(bottom: 16),
-                        decoration: BoxDecoration(
-                          color: FormaColors.coralPink.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: FormaColors.coralPink),
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.error_outline_rounded,
-                                color: FormaColors.coralPink, size: 20),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                _errorMessage!,
-                                style: const TextStyle(
-                                    color: FormaColors.coralPink,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w600),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-
-                    // 1. Visual Center: Large Amount Display Card (Pakee inspiration)
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 28, horizontal: 20),
-                      decoration: BoxDecoration(
-                        color: cardBg,
-                        borderRadius: BorderRadius.circular(28),
-                        border: Border.all(
-                          color: isDark
-                              ? Colors.white10
-                              : FormaColors.divider.withValues(alpha: 0.6),
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black
-                                .withValues(alpha: isDark ? 0.25 : 0.04),
-                            blurRadius: 16,
-                            offset: const Offset(0, 6),
+        child: GestureDetector(
+          onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+          behavior: HitTestBehavior.translucent,
+          child: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (_errorMessage != null) ...[
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          margin: const EdgeInsets.only(bottom: 16),
+                          decoration: BoxDecoration(
+                            color:
+                                FormaColors.coralPink.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(color: FormaColors.coralPink),
                           ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Text(
-                            'ENTER AMOUNT',
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 1.5,
-                              color: secondaryTextColor,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          ValueListenableBuilder<String>(
-                            valueListenable: _amountNotifier,
-                            builder: (context, value, _) {
-                              final displayAmount = value.isEmpty ? '0' : value;
-                              return Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.baseline,
-                                textBaseline: TextBaseline.alphabetic,
-                                children: [
-                                  Text(
-                                    '₹',
-                                    style: GoogleFonts.plusJakartaSans(
-                                      fontSize: 34,
-                                      fontWeight: FontWeight.w700,
-                                      color: FormaColors.goldenYellow,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    displayAmount,
-                                    style: GoogleFonts.plusJakartaSans(
-                                      fontSize: 54,
-                                      fontWeight: FontWeight.w900,
-                                      letterSpacing: -1.5,
-                                      color: value.isEmpty
-                                          ? secondaryTextColor.withValues(
-                                              alpha: 0.5)
-                                          : primaryTextColor,
-                                    ),
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
-                          const SizedBox(height: 6),
-                          Text(
-                            'Indian Rupee (INR)',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: secondaryTextColor,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // 2. What was this for? Title field
-                    Text(
-                      'What was this for?',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w800,
-                        color: primaryTextColor,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: _titleController,
-                      style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: primaryTextColor),
-                      decoration: InputDecoration(
-                        hintText: 'e.g. Lunch, Bus ticket, Supplements',
-                        hintStyle: TextStyle(
-                            color: secondaryTextColor.withValues(alpha: 0.6)),
-                        prefixIcon: const Icon(Icons.edit_note_rounded,
-                            color: FormaColors.primaryAccent),
-                        filled: true,
-                        fillColor: cardBg,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(18),
-                          borderSide: BorderSide(
-                              color: isDark
-                                  ? Colors.white10
-                                  : FormaColors.divider),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(18),
-                          borderSide: BorderSide(
-                              color: isDark
-                                  ? Colors.white10
-                                  : FormaColors.divider),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(18),
-                          borderSide: const BorderSide(
-                              color: FormaColors.primaryAccent, width: 2),
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // 3. Category Selector
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Category',
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w800,
-                            color: primaryTextColor,
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: _showAddCustomCategoryDialog,
-                          child: const Row(
+                          child: Row(
                             children: [
-                              Icon(Icons.add_rounded,
-                                  size: 16, color: FormaColors.primaryAccent),
-                              SizedBox(width: 4),
-                              Text(
-                                'Custom',
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w700,
-                                  color: FormaColors.primaryAccent,
+                              const Icon(Icons.error_outline_rounded,
+                                  color: FormaColors.coralPink, size: 20),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  _errorMessage!,
+                                  style: const TextStyle(
+                                      color: FormaColors.coralPink,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600),
                                 ),
                               ),
                             ],
                           ),
                         ),
                       ],
-                    ),
-                    const SizedBox(height: 10),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      physics: const BouncingScrollPhysics(),
-                      child: Row(
-                        children: _categories.map((cat) {
-                          final isSel = _selectedCategory.toLowerCase() ==
-                              cat.name.toLowerCase();
-                          return Padding(
-                            padding: const EdgeInsets.only(right: 8),
-                            child: FormaBounceable(
-                              onTap: () {
-                                HapticFeedback.selectionClick();
-                                setState(() => _selectedCategory = cat.name);
-                              },
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 180),
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 14, vertical: 10),
-                                decoration: BoxDecoration(
-                                  color: isSel
-                                      ? cat.color.withValues(
-                                          alpha: isDark ? 0.35 : 0.2)
-                                      : cardBg,
-                                  borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(
-                                    color: isSel
-                                        ? cat.color
-                                        : (isDark
-                                            ? Colors.white10
-                                            : FormaColors.divider),
-                                    width: isSel ? 2 : 1,
-                                  ),
-                                ),
-                                child: Row(
+
+                      // 1. Visual Center: Large Amount Display Card (Pakee inspiration)
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 28, horizontal: 20),
+                        decoration: BoxDecoration(
+                          color: cardBg,
+                          borderRadius: BorderRadius.circular(28),
+                          border: Border.all(
+                            color: isDark
+                                ? Colors.white10
+                                : FormaColors.divider.withValues(alpha: 0.6),
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black
+                                  .withValues(alpha: isDark ? 0.25 : 0.04),
+                              blurRadius: 16,
+                              offset: const Offset(0, 6),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              'ENTER AMOUNT',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 1.5,
+                                color: secondaryTextColor,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            ValueListenableBuilder<String>(
+                              valueListenable: _amountNotifier,
+                              builder: (context, value, _) {
+                                final displayAmount =
+                                    value.isEmpty ? '0' : value;
+                                return Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.baseline,
+                                  textBaseline: TextBaseline.alphabetic,
                                   children: [
-                                    Icon(cat.icon,
-                                        size: 18,
-                                        color: isSel
-                                            ? cat.color
-                                            : secondaryTextColor),
-                                    const SizedBox(width: 8),
                                     Text(
-                                      cat.name,
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        fontWeight: isSel
-                                            ? FontWeight.w800
-                                            : FontWeight.w600,
-                                        color: isSel
-                                            ? primaryTextColor
-                                            : secondaryTextColor,
+                                      '₹',
+                                      style: GoogleFonts.plusJakartaSans(
+                                        fontSize: 34,
+                                        fontWeight: FontWeight.w700,
+                                        color: FormaColors.goldenYellow,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      displayAmount,
+                                      style: GoogleFonts.plusJakartaSans(
+                                        fontSize: 54,
+                                        fontWeight: FontWeight.w900,
+                                        letterSpacing: -1.5,
+                                        color: value.isEmpty
+                                            ? secondaryTextColor.withValues(
+                                                alpha: 0.5)
+                                            : primaryTextColor,
                                       ),
                                     ),
                                   ],
-                                ),
+                                );
+                              },
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              'Indian Rupee (INR)',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: secondaryTextColor,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
-                          );
-                        }).toList(),
+                          ],
+                        ),
                       ),
-                    ),
 
-                    const SizedBox(height: 20),
+                      const SizedBox(height: 20),
 
-                    // 4. Date & Time Selector
-                    Text(
-                      'Date',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w800,
-                        color: primaryTextColor,
+                      // 2. What was this for? Title field
+                      Text(
+                        'What was this for?',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w800,
+                          color: primaryTextColor,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    FormaBounceable(
-                      onTap: _selectDate,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 14),
-                        decoration: BoxDecoration(
-                          color: cardBg,
-                          borderRadius: BorderRadius.circular(18),
-                          border: Border.all(
-                            color:
-                                isDark ? Colors.white10 : FormaColors.divider,
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: _titleController,
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: primaryTextColor),
+                        decoration: InputDecoration(
+                          hintText: 'e.g. Lunch, Bus ticket, Supplements',
+                          hintStyle: TextStyle(
+                              color: secondaryTextColor.withValues(alpha: 0.6)),
+                          prefixIcon: const Icon(Icons.edit_note_rounded,
+                              color: FormaColors.primaryAccent),
+                          filled: true,
+                          fillColor: cardBg,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(18),
+                            borderSide: BorderSide(
+                                color: isDark
+                                    ? Colors.white10
+                                    : FormaColors.divider),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(18),
+                            borderSide: BorderSide(
+                                color: isDark
+                                    ? Colors.white10
+                                    : FormaColors.divider),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(18),
+                            borderSide: const BorderSide(
+                                color: FormaColors.primaryAccent, width: 2),
                           ),
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      // 3. Category Selector
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Category',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w800,
+                              color: primaryTextColor,
+                            ),
+                          ),
+                          GestureDetector(
+                            onTap: _showAddCustomCategoryDialog,
+                            child: const Row(
                               children: [
-                                const Icon(Icons.calendar_today_rounded,
-                                    size: 20, color: FormaColors.primaryAccent),
-                                const SizedBox(width: 12),
+                                Icon(Icons.add_rounded,
+                                    size: 16, color: FormaColors.primaryAccent),
+                                SizedBox(width: 4),
                                 Text(
-                                  '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
+                                  'Custom',
                                   style: TextStyle(
-                                    fontSize: 15,
+                                    fontSize: 13,
                                     fontWeight: FontWeight.w700,
-                                    color: primaryTextColor,
+                                    color: FormaColors.primaryAccent,
                                   ),
                                 ),
                               ],
                             ),
-                            Icon(Icons.arrow_forward_ios_rounded,
-                                size: 14, color: secondaryTextColor),
-                          ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        physics: const BouncingScrollPhysics(),
+                        child: Row(
+                          children: _categories.map((cat) {
+                            final isSel = _selectedCategory.toLowerCase() ==
+                                cat.name.toLowerCase();
+                            return Padding(
+                              padding: const EdgeInsets.only(right: 8),
+                              child: FormaBounceable(
+                                onTap: () {
+                                  HapticFeedback.selectionClick();
+                                  setState(() => _selectedCategory = cat.name);
+                                },
+                                child: AnimatedContainer(
+                                  duration: const Duration(milliseconds: 180),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 14, vertical: 10),
+                                  decoration: BoxDecoration(
+                                    color: isSel
+                                        ? cat.color.withValues(
+                                            alpha: isDark ? 0.35 : 0.2)
+                                        : cardBg,
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(
+                                      color: isSel
+                                          ? cat.color
+                                          : (isDark
+                                              ? Colors.white10
+                                              : FormaColors.divider),
+                                      width: isSel ? 2 : 1,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Icon(cat.icon,
+                                          size: 18,
+                                          color: isSel
+                                              ? cat.color
+                                              : secondaryTextColor),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        cat.name,
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: isSel
+                                              ? FontWeight.w800
+                                              : FontWeight.w600,
+                                          color: isSel
+                                              ? primaryTextColor
+                                              : secondaryTextColor,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          }).toList(),
                         ),
                       ),
-                    ),
 
-                    const SizedBox(height: 20),
+                      const SizedBox(height: 20),
 
-                    // 5. Optional Note Field
-                    Text(
-                      'Optional Note',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w800,
-                        color: primaryTextColor,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: _noteController,
-                      maxLines: 2,
-                      style: TextStyle(fontSize: 14, color: primaryTextColor),
-                      decoration: InputDecoration(
-                        hintText: 'Add extra details, place, or reason...',
-                        hintStyle: TextStyle(
-                            color: secondaryTextColor.withValues(alpha: 0.6)),
-                        filled: true,
-                        fillColor: cardBg,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(18),
-                          borderSide: BorderSide(
-                              color: isDark
-                                  ? Colors.white10
-                                  : FormaColors.divider),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(18),
-                          borderSide: BorderSide(
-                              color: isDark
-                                  ? Colors.white10
-                                  : FormaColors.divider),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(18),
-                          borderSide: const BorderSide(
-                              color: FormaColors.primaryAccent, width: 2),
+                      // 4. Date & Time Selector
+                      Text(
+                        'Date',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w800,
+                          color: primaryTextColor,
                         ),
                       ),
-                    ),
+                      const SizedBox(height: 8),
+                      FormaBounceable(
+                        onTap: _selectDate,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 14),
+                          decoration: BoxDecoration(
+                            color: cardBg,
+                            borderRadius: BorderRadius.circular(18),
+                            border: Border.all(
+                              color:
+                                  isDark ? Colors.white10 : FormaColors.divider,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  const Icon(Icons.calendar_today_rounded,
+                                      size: 20,
+                                      color: FormaColors.primaryAccent),
+                                  const SizedBox(width: 12),
+                                  Text(
+                                    '${_selectedDate.day}/${_selectedDate.month}/${_selectedDate.year}',
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w700,
+                                      color: primaryTextColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Icon(Icons.arrow_forward_ios_rounded,
+                                  size: 14, color: secondaryTextColor),
+                            ],
+                          ),
+                        ),
+                      ),
 
-                    const SizedBox(height: 20),
-                  ],
+                      const SizedBox(height: 20),
+
+                      // 5. Optional Note Field
+                      Text(
+                        'Optional Note',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w800,
+                          color: primaryTextColor,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      TextField(
+                        controller: _noteController,
+                        maxLines: 2,
+                        style: TextStyle(fontSize: 14, color: primaryTextColor),
+                        decoration: InputDecoration(
+                          hintText: 'Add extra details, place, or reason...',
+                          hintStyle: TextStyle(
+                              color: secondaryTextColor.withValues(alpha: 0.6)),
+                          filled: true,
+                          fillColor: cardBg,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(18),
+                            borderSide: BorderSide(
+                                color: isDark
+                                    ? Colors.white10
+                                    : FormaColors.divider),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(18),
+                            borderSide: BorderSide(
+                                color: isDark
+                                    ? Colors.white10
+                                    : FormaColors.divider),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(18),
+                            borderSide: const BorderSide(
+                                color: FormaColors.primaryAccent, width: 2),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 20),
+                    ],
+                  ),
                 ),
               ),
-            ),
 
-            // 6. Custom Numeric Keypad or System Keyboard toggle
-            if (_useCustomKeypad)
-              CustomNumericKeypad(
-                amountNotifier: _amountNotifier,
-                isDark: isDark,
-                showDoneButton: false,
-                onSwitchToSystemKeyboard: () {
-                  setState(() => _useCustomKeypad = false);
-                },
-              )
-            else
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                child: TextButton.icon(
-                  icon: const Icon(Icons.dialpad_rounded),
-                  label: const Text('Switch back to tactile numeric keypad'),
-                  onPressed: () => setState(() => _useCustomKeypad = true),
+              // 6. Custom Numeric Keypad or System Keyboard toggle
+              if (_useCustomKeypad)
+                CustomNumericKeypad(
+                  amountNotifier: _amountNotifier,
+                  isDark: isDark,
+                  showDoneButton: false,
+                  onSwitchToSystemKeyboard: () {
+                    setState(() => _useCustomKeypad = false);
+                  },
+                )
+              else
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  child: TextButton.icon(
+                    icon: const Icon(Icons.dialpad_rounded),
+                    label: const Text('Switch back to tactile numeric keypad'),
+                    onPressed: () => setState(() => _useCustomKeypad = true),
+                  ),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
       ),
     );

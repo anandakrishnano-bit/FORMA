@@ -67,7 +67,9 @@ class UserModel {
       photoUrl: (data['photoURL'] ?? data['photoUrl'] ?? data['avatarUrl'])
           as String?,
       bio: data['bio'] as String?,
-      onboardingComplete: data['onboardingComplete'] as bool? ?? false,
+      onboardingComplete: (data['onboardingComplete'] as bool?) ??
+          (data['onboardingCompleted'] as bool?) ??
+          false,
       preferences: data['preferences'] as Map<String, dynamic>?,
       trainingPreferences: data['trainingPreferences'] as Map<String, dynamic>?,
       habits: (data['habits'] as List<dynamic>?)?.cast<String>(),
@@ -269,7 +271,10 @@ final isOnboardingCompleteProvider = FutureProvider<bool>((ref) async {
       .get();
 
   if (!doc.exists) return false;
-  return (doc.data()?['onboardingComplete'] as bool?) ?? false;
+  final data = doc.data() ?? {};
+  return (data['onboardingComplete'] as bool?) ??
+      (data['onboardingCompleted'] as bool?) ??
+      false;
 });
 
 // ─────────────────────── Parameter Classes ────────────────────────────────

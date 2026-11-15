@@ -26,6 +26,7 @@ import 'package:forma/features/home/widgets/daily_summary_card.dart';
 import 'package:forma/core/components/forma_logo.dart';
 import 'package:forma/core/components/forma_avatar.dart';
 import 'package:forma/features/authentication/providers/auth_providers.dart';
+import 'package:forma/core/services/daily_summary_service.dart';
 import 'package:forma/features/home/widgets/daily_energy_rings_widget.dart';
 import 'package:forma/features/home/widgets/compact_weekly_muscle_widget.dart';
 import 'package:forma/features/home/repositories/home_customization_repository.dart';
@@ -526,8 +527,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       case 'energy_score':
         return ref.watch(todaySummaryProvider).when(
               data: (summary) => DailyEnergyRingsWidget(summary: summary),
-              loading: () => const SizedBox.shrink(),
-              error: (_, __) => const SizedBox.shrink(),
+              loading: () => DailyEnergyRingsWidget(
+                summary: DailySummaryService().generateSummary(
+                  completedWorkouts: [],
+                  loggedMeals: [],
+                  habits: [],
+                  habitCompletion: {},
+                  userName: 'Athlete',
+                ),
+              ),
+              error: (_, __) => DailyEnergyRingsWidget(
+                summary: DailySummaryService().generateSummary(
+                  completedWorkouts: [],
+                  loggedMeals: [],
+                  habits: [],
+                  habitCompletion: {},
+                  userName: 'Athlete',
+                ),
+              ),
             );
 
       case 'today_focus':
@@ -829,8 +846,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: ref.watch(todaySummaryProvider).when(
                 data: (s) => DailySummaryCard(summary: s),
-                loading: () => const SizedBox.shrink(),
-                error: (_, __) => const SizedBox.shrink(),
+                loading: () => DailySummaryCard(
+                  summary: DailySummaryService().generateSummary(
+                    completedWorkouts: [],
+                    loggedMeals: [],
+                    habits: [],
+                    habitCompletion: {},
+                    userName: 'Athlete',
+                  ),
+                ),
+                error: (_, __) => DailySummaryCard(
+                  summary: DailySummaryService().generateSummary(
+                    completedWorkouts: [],
+                    loggedMeals: [],
+                    habits: [],
+                    habitCompletion: {},
+                    userName: 'Athlete',
+                  ),
+                ),
               ),
         );
 
@@ -851,6 +884,78 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               height: 130,
               child: habitsAsync.when(
                 data: (habits) {
+                  if (habits.isEmpty) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: GestureDetector(
+                        onTap: () => context.go('/habits'),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 16),
+                          decoration: BoxDecoration(
+                            color: isDark ? FormaColors.charcoal : Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color:
+                                  isDark ? Colors.white10 : FormaColors.divider,
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: FormaColors.primaryAccent
+                                      .withValues(alpha: 0.15),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.check_circle_outline_rounded,
+                                  color: FormaColors.primaryAccent,
+                                  size: 24,
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'Set Up Your First Daily Habit',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w800,
+                                        color: isDark
+                                            ? FormaColors.darkPrimaryText
+                                            : FormaColors.lightPrimaryText,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      'Track water, workouts, sleep, and routines daily.',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: isDark
+                                            ? FormaColors.darkSecondaryText
+                                            : FormaColors.lightSecondaryText,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Icon(
+                                Icons.chevron_right_rounded,
+                                color: isDark
+                                    ? Colors.white54
+                                    : FormaColors.concreteGrey,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  }
                   return ListView.builder(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
                     scrollDirection: Axis.horizontal,
@@ -874,7 +979,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     },
                   );
                 },
-                loading: () => const Center(child: CircularProgressIndicator()),
+                loading: () => const Center(
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                ),
                 error: (_, __) => const SizedBox.shrink(),
               ),
             ),

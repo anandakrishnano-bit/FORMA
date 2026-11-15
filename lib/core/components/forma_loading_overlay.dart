@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:forma/core/theme/app_colors.dart';
+import 'package:forma/core/components/forma_logo.dart';
 
 /// Aesthetic, fluid loading overlay with glowing animated rings
 /// and cycling motivational status text.
@@ -25,10 +26,10 @@ class _FormaLoadingOverlayState extends State<FormaLoadingOverlay>
   late Animation<double> _rotationAnimation;
 
   final List<String> _statusMessages = [
-    'Opening your private fitness vault...',
-    'Calibrating daily goals & streaks...',
-    'Personalizing workouts & nutrition...',
-    'Ready in a moment...',
+    'Creating your private FORMA profile...',
+    'Securing daily habits & routines...',
+    'Configuring personalized dashboard...',
+    'Finalizing encrypted fitness vault...',
   ];
   int _messageIndex = 0;
 
@@ -162,10 +163,9 @@ class _FormaLoadingOverlayState extends State<FormaLoadingOverlay>
                             ),
                           ),
                         ),
-                        const Icon(
-                          Icons.fitness_center_rounded,
-                          size: 24,
-                          color: FormaColors.goldenYellow,
+                        const FormaLogo(
+                          size: 26,
+                          isCropped: false,
                         ),
                       ],
                     ),

@@ -166,9 +166,15 @@ class _CreateGroupDialogState extends ConsumerState<CreateGroupDialog> {
             const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
+                    alignment: Alignment.center,
+                  ),
                   child: const Text('Cancel'),
                 ),
                 const SizedBox(width: 8),

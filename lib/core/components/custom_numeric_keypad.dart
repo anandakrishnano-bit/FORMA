@@ -29,6 +29,7 @@ class CustomNumericKeypad extends StatelessWidget {
   });
 
   void _handleKeyTap(String key) {
+    FocusManager.instance.primaryFocus?.unfocus();
     HapticFeedback.selectionClick();
     final current = amountNotifier.value;
 

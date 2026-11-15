@@ -78,6 +78,9 @@ class _OnboardingFlowScreenState extends ConsumerState<OnboardingFlowScreen> {
       setState(() => _accountStepError = null);
     }
 
+    FocusScope.of(context).unfocus();
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
     if (_currentStep < _totalSteps - 1) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
@@ -89,6 +92,9 @@ class _OnboardingFlowScreenState extends ConsumerState<OnboardingFlowScreen> {
   }
 
   void _prevPage() {
+    FocusScope.of(context).unfocus();
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
     if (_currentStep > 0) {
       _pageController.previousPage(
         duration: const Duration(milliseconds: 300),
@@ -100,10 +106,12 @@ class _OnboardingFlowScreenState extends ConsumerState<OnboardingFlowScreen> {
   }
 
   Future<void> _completeRegistrationAndEnterApp() async {
+    final currentUser = FirebaseAuth.instance.currentUser;
     final email = _emailController.text.trim();
     final password = _passwordController.text;
 
-    if (email.isEmpty || password.isEmpty) {
+    // Only require email and password if the user is not already authenticated
+    if (currentUser == null && (email.isEmpty || password.isEmpty)) {
       // Jump back to account creation step if fields were skipped
       _pageController.jumpToPage(1);
       setState(() => _accountStepError =
@@ -117,24 +125,37 @@ class _OnboardingFlowScreenState extends ConsumerState<OnboardingFlowScreen> {
     });
 
     try {
-      final credential =
-          await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      final String uid;
+      final String userEmail;
 
-      final uid = credential.user!.uid;
+      if (currentUser != null) {
+        // User already authenticated (Google, Phone OTP, or active session)
+        uid = currentUser.uid;
+        userEmail = currentUser.email ?? email;
+      } else {
+        final credential =
+            await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: email,
+          password: password,
+        );
+        uid = credential.user!.uid;
+        userEmail = email;
+      }
+
       final name = _displayNameController.text.trim().isNotEmpty
           ? _displayNameController.text.trim()
-          : 'Athlete';
+          : (currentUser?.displayName ?? 'Athlete');
 
-      await credential.user?.updateDisplayName(name);
+      final activeUser = FirebaseAuth.instance.currentUser;
+      if (activeUser != null && name.isNotEmpty) {
+        await activeUser.updateDisplayName(name).catchError((_) {});
+      }
 
-      // Save real user document in Firestore
+      // Save real user document in Firestore with both onboarding flags set
       final friendCode = 'FORMA-${uid.substring(0, 6).toUpperCase()}';
       await FirebaseFirestore.instance.collection('users').doc(uid).set({
         'uid': uid,
-        'email': email,
+        'email': userEmail,
         'displayName': name,
         'unitSystem': _unitSystem,
         'trainingDays': _trainingDays,
@@ -144,8 +165,10 @@ class _OnboardingFlowScreenState extends ConsumerState<OnboardingFlowScreen> {
         'friendCode': friendCode,
         'friends': <String>[],
         'createdAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
         'onboardingComplete': true,
-      });
+        'onboardingCompleted': true,
+      }, SetOptions(merge: true));
 
       // Save custom & selected habits into HabitRepository for immediate daily use
       final habitRepo = ref.read(habitRepositoryProvider);
@@ -722,20 +745,12 @@ class _OnboardingFlowScreenState extends ConsumerState<OnboardingFlowScreen> {
                                     label: 'Confirm & Save API Key',
                                     icon: Icons.check_circle_rounded,
                                     onPressed: () async {
+                                      FocusScope.of(context).unfocus();
+                                      ScaffoldMessenger.of(context)
+                                          .hideCurrentSnackBar();
                                       await SecureStorageService()
                                           .saveUserGeminiApiKey(
                                               _personalGeminiKey);
-                                      if (context.mounted) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          const SnackBar(
-                                            content: Text(
-                                                '✓ Gemini API Key secured in Android Keystore!'),
-                                            backgroundColor:
-                                                FormaColors.success,
-                                          ),
-                                        );
-                                      }
                                       _nextPage();
                                     },
                                   ),
@@ -831,6 +846,7 @@ class _OnboardingFlowScreenState extends ConsumerState<OnboardingFlowScreen> {
                             'Tap below to create your secure account and enter FORMA.',
                         content: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             if (_registrationError != null)
                               Container(
@@ -885,7 +901,9 @@ class _OnboardingFlowScreenState extends ConsumerState<OnboardingFlowScreen> {
                         ),
                         buttonLabel: _isRegistering
                             ? 'Creating Account...'
-                            : 'Open Home Dashboard',
+                            : (_registrationError != null
+                                ? 'Retry Setup'
+                                : 'Open Home Dashboard'),
                         isLoading: _isRegistering,
                         onAction: _isRegistering
                             ? () {}
@@ -907,15 +925,24 @@ class _OnboardingFlowScreenState extends ConsumerState<OnboardingFlowScreen> {
 
   Widget _buildRecapRow(String title, String value) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title,
-            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
-        Text(value,
+        Text(
+          title,
+          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Text(
+            value,
+            textAlign: TextAlign.end,
             style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w800,
-                color: FormaColors.primaryAccent)),
+              fontSize: 13,
+              fontWeight: FontWeight.w800,
+              color: FormaColors.primaryAccent,
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -956,8 +983,26 @@ class _OnboardingFlowScreenState extends ConsumerState<OnboardingFlowScreen> {
                   : FormaColors.lightSecondaryText,
             ),
           ),
-          const SizedBox(height: 28),
-          Expanded(child: SingleChildScrollView(child: content)),
+          const SizedBox(height: 24),
+          Expanded(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
+                      minWidth: constraints.maxWidth,
+                    ),
+                    child: IntrinsicHeight(
+                      child: content,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 16),
           if (bottomAction != null)
             bottomAction
           else
