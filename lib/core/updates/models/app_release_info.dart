@@ -83,7 +83,8 @@ class AppReleaseInfo {
     String? checksumText,
   }) {
     final rawTag = (json['tag_name'] as String?) ?? '';
-    final cleanVersion = _cleanVersionString(rawTag.isNotEmpty ? rawTag : (json['name'] as String? ?? '1.0.0'));
+    final cleanVersion = _cleanVersionString(
+        rawTag.isNotEmpty ? rawTag : (json['name'] as String? ?? '1.0.0'));
 
     final assets = (json['assets'] as List<dynamic>?) ?? [];
     Map<String, dynamic>? apkAsset;
@@ -100,7 +101,8 @@ class AppReleaseInfo {
     }
 
     if (apkAsset == null) {
-      throw const FormatException('Release does not contain an Android .apk asset.');
+      throw const FormatException(
+          'Release does not contain an Android .apk asset.');
     }
 
     final downloadUrl = (apkAsset['browser_download_url'] as String?) ?? '';
@@ -121,12 +123,15 @@ class AppReleaseInfo {
     // Determine priority
     UpdatePriority parsedPriority = UpdatePriority.normal;
     if (metadataJson != null && metadataJson['priority'] != null) {
-      parsedPriority = UpdatePriority.fromString(metadataJson['priority']?.toString());
+      parsedPriority =
+          UpdatePriority.fromString(metadataJson['priority']?.toString());
     } else {
       final bodyText = (json['body'] as String?) ?? '';
-      if (bodyText.contains('[priority:critical]') || bodyText.contains('#priority:critical')) {
+      if (bodyText.contains('[priority:critical]') ||
+          bodyText.contains('#priority:critical')) {
         parsedPriority = UpdatePriority.critical;
-      } else if (bodyText.contains('[priority:important]') || bodyText.contains('#priority:important')) {
+      } else if (bodyText.contains('[priority:important]') ||
+          bodyText.contains('#priority:important')) {
         parsedPriority = UpdatePriority.important;
       }
     }
@@ -143,8 +148,10 @@ class AppReleaseInfo {
       version: cleanVersion,
       versionCode: parsedCode,
       title: (json['name'] as String?) ?? cleanVersion,
-      releaseNotes: (json['body'] as String?) ?? 'Performance optimizations and general stability improvements.',
-      publishedAt: DateTime.tryParse(json['published_at'] as String? ?? '') ?? DateTime.now(),
+      releaseNotes: (json['body'] as String?) ??
+          'Performance optimizations and general stability improvements.',
+      publishedAt: DateTime.tryParse(json['published_at'] as String? ?? '') ??
+          DateTime.now(),
       isPrerelease: (json['prerelease'] as bool?) ?? false,
       isDraft: (json['draft'] as bool?) ?? false,
       priority: parsedPriority,
@@ -153,7 +160,8 @@ class AppReleaseInfo {
       apkFileName: fileName,
       apkSizeBytes: sizeBytes,
       sha256Checksum: expectedSha256,
-      htmlUrl: (json['html_url'] as String?) ?? 'https://github.com/anandakrishnano-bit/FORMA/releases',
+      htmlUrl: (json['html_url'] as String?) ??
+          'https://github.com/anandakrishnano-bit/FORMA/releases',
     );
   }
 
@@ -167,7 +175,8 @@ class AppReleaseInfo {
 
     // 2. Fallback to semantic version comparison
     final releaseParts = _parseSemantic(version);
-    final installedParts = _parseSemantic(_cleanVersionString(installedVersionName));
+    final installedParts =
+        _parseSemantic(_cleanVersionString(installedVersionName));
 
     for (int i = 0; i < 3; i++) {
       if (releaseParts[i] > installedParts[i]) return true;
@@ -181,10 +190,12 @@ class AppReleaseInfo {
   /// Determines whether the installed version is older than the required minimum.
   bool isCriticalFor(String installedVersionName, int installedVersionCode) {
     if (priority == UpdatePriority.critical) return true;
-    if (minSupportedVersion == null || minSupportedVersion!.isEmpty) return false;
+    if (minSupportedVersion == null || minSupportedVersion!.isEmpty)
+      return false;
 
     final minParts = _parseSemantic(_cleanVersionString(minSupportedVersion!));
-    final installedParts = _parseSemantic(_cleanVersionString(installedVersionName));
+    final installedParts =
+        _parseSemantic(_cleanVersionString(installedVersionName));
 
     for (int i = 0; i < 3; i++) {
       if (installedParts[i] < minParts[i]) return true;
@@ -222,7 +233,8 @@ class AppReleaseInfo {
       if (trimmed.contains(targetFileName)) {
         final tokens = trimmed.split(RegExp(r'\s+'));
         for (final token in tokens) {
-          final clean = token.replaceAll(RegExp(r'[^a-fA-F0-9]'), '').toLowerCase();
+          final clean =
+              token.replaceAll(RegExp(r'[^a-fA-F0-9]'), '').toLowerCase();
           if (clean.length == 64) {
             return clean;
           }

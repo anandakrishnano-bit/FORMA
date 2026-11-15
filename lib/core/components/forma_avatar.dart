@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:forma/core/theme/app_colors.dart';
@@ -6,8 +8,10 @@ import 'package:forma/data/models/preset_avatar_model.dart';
 /// Unified Brand Avatar Widget for FORMA
 /// Handles:
 /// 1. FORMA-themed preset vector avatars (`preset:<id>`)
-/// 2. User uploaded photographic URLs
-/// 3. Initial letter fallback with brand styling
+/// 2. User uploaded photographic URLs (`http://`, `https://`)
+/// 3. Embedded Base64 Data URIs (`data:image/...;base64,...`)
+/// 4. Local file paths (`file:...` or raw filesystem path)
+/// 5. Initial letter fallback with brand styling
 class FormaAvatar extends StatelessWidget {
   final String? photoUrl;
   final String name;
@@ -28,11 +32,12 @@ class FormaAvatar extends StatelessWidget {
   Widget build(BuildContext context) {
     final cleanName = name.trim();
     final initial = cleanName.isNotEmpty ? cleanName[0].toUpperCase() : 'A';
+    final url = photoUrl?.trim();
 
     // 1. Check for FORMA Preset Avatar
-    if (photoUrl != null && photoUrl!.startsWith('preset:')) {
-      final preset = FormaPresetAvatar.fromKey(photoUrl) ??
-          FormaPresetAvatar.collection.first;
+    if (url != null && url.startsWith('preset:')) {
+      final preset =
+          FormaPresetAvatar.fromKey(url) ?? FormaPresetAvatar.collection.first;
       return Container(
         width: size,
         height: size,
@@ -41,7 +46,9 @@ class FormaAvatar extends StatelessWidget {
           color: preset.backgroundColor,
           border: borderWidth > 0
               ? Border.all(
-                  color: borderColor ?? preset.primaryColor, width: borderWidth)
+                  color: borderColor ?? preset.primaryColor,
+                  width: borderWidth,
+                )
               : null,
           boxShadow: [
             BoxShadow(
@@ -61,40 +68,97 @@ class FormaAvatar extends StatelessWidget {
       );
     }
 
-    // 2. Check for Uploaded Photo URL
-    if (photoUrl != null && photoUrl!.startsWith('http')) {
-      return Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          border: borderWidth > 0
-              ? Border.all(
-                  color: borderColor ?? FormaColors.goldenYellow,
-                  width: borderWidth)
-              : null,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.15),
-              blurRadius: 4,
-              offset: const Offset(0, 1),
+    // 2. Check for Embedded Base64 Data URI
+    if (url != null && url.startsWith('data:image')) {
+      try {
+        final commaIdx = url.indexOf(',');
+        if (commaIdx != -1) {
+          final base64Data = url.substring(commaIdx + 1);
+          final bytes = base64Decode(base64Data);
+          return _buildCircularImageContainer(
+            initial,
+            Image.memory(
+              bytes,
+              fit: BoxFit.cover,
+              width: size,
+              height: size,
+              errorBuilder: (_, __, ___) => _buildInitialAvatar(initial),
             ),
-          ],
-        ),
-        child: ClipOval(
-          child: Image.network(
-            photoUrl!,
-            fit: BoxFit.cover,
-            width: size,
-            height: size,
-            errorBuilder: (_, __, ___) => _buildInitialAvatar(initial),
-          ),
+          );
+        }
+      } catch (_) {
+        return _buildInitialAvatar(initial);
+      }
+    }
+
+    // 3. Check for Uploaded Photo URL (HTTP / HTTPS)
+    if (url != null &&
+        (url.startsWith('http://') || url.startsWith('https://'))) {
+      return _buildCircularImageContainer(
+        initial,
+        Image.network(
+          url,
+          fit: BoxFit.cover,
+          width: size,
+          height: size,
+          errorBuilder: (_, __, ___) => _buildInitialAvatar(initial),
         ),
       );
     }
 
-    // 3. Fallback Initial Avatar
+    // 4. Check for Local File URI or File Path
+    if (url != null && url.isNotEmpty) {
+      String path = url;
+      if (path.startsWith('file://')) {
+        path = path.substring(7);
+      } else if (path.startsWith('file:')) {
+        path = path.substring(5);
+      }
+      try {
+        final file = File(path);
+        if (file.existsSync()) {
+          return _buildCircularImageContainer(
+            initial,
+            Image.file(
+              file,
+              fit: BoxFit.cover,
+              width: size,
+              height: size,
+              errorBuilder: (_, __, ___) => _buildInitialAvatar(initial),
+            ),
+          );
+        }
+      } catch (_) {
+        // Fall back to initials
+      }
+    }
+
+    // 5. Fallback Initial Avatar
     return _buildInitialAvatar(initial);
+  }
+
+  Widget _buildCircularImageContainer(String initial, Widget imageWidget) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: borderWidth > 0
+            ? Border.all(
+                color: borderColor ?? FormaColors.goldenYellow,
+                width: borderWidth,
+              )
+            : null,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.15),
+            blurRadius: 4,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: ClipOval(child: imageWidget),
+    );
   }
 
   Widget _buildInitialAvatar(String initial) {
@@ -107,10 +171,12 @@ class FormaAvatar extends StatelessWidget {
         border: borderWidth > 0
             ? Border.all(
                 color: borderColor ?? FormaColors.goldenYellow,
-                width: borderWidth)
+                width: borderWidth,
+              )
             : Border.all(
                 color: FormaColors.goldenYellow.withValues(alpha: 0.5),
-                width: 1.5),
+                width: 1.5,
+              ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.1),

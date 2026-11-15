@@ -185,132 +185,134 @@ class _GlobalSearchScreenState extends ConsumerState<GlobalSearchScreen> {
                 fontWeight: FontWeight.w800, fontSize: 18),
           ),
         ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Search Input Field
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: isDark ? FormaColors.charcoal : Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: isDark
-                        ? Colors.white12
-                        : FormaColors.divider.withValues(alpha: 0.6),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color:
-                          Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
-                      blurRadius: 10,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: TextField(
-                  controller: _searchController,
-                  focusNode: _searchFocusNode,
-                  textInputAction: TextInputAction.search,
-                  decoration: InputDecoration(
-                    hintText:
-                        'Search exercises, food, workouts, habits, expenses...',
-                    hintStyle: TextStyle(
-                      fontSize: 13,
+        body: SafeArea(
+          child: Column(
+            children: [
+              // Search Input Field
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: isDark ? FormaColors.charcoal : Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
                       color: isDark
-                          ? FormaColors.darkSecondaryText
-                          : FormaColors.lightSecondaryText,
+                          ? Colors.white12
+                          : FormaColors.divider.withValues(alpha: 0.6),
                     ),
-                    prefixIcon: const Icon(Icons.search_rounded,
-                        color: FormaColors.concreteGrey),
-                    suffixIcon: _searchController.text.isNotEmpty
-                        ? IconButton(
-                            icon: const Icon(Icons.clear_rounded, size: 20),
-                            onPressed: () {
-                              _searchController.clear();
-                              setState(() => _currentQuery = '');
-                            },
-                          )
-                        : null,
-                    border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 14),
+                    boxShadow: [
+                      BoxShadow(
+                        color:
+                            Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
+                        blurRadius: 10,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: TextField(
+                    controller: _searchController,
+                    focusNode: _searchFocusNode,
+                    textInputAction: TextInputAction.search,
+                    decoration: InputDecoration(
+                      hintText:
+                          'Search exercises, food, workouts, habits, expenses...',
+                      hintStyle: TextStyle(
+                        fontSize: 13,
+                        color: isDark
+                            ? FormaColors.darkSecondaryText
+                            : FormaColors.lightSecondaryText,
+                      ),
+                      prefixIcon: const Icon(Icons.search_rounded,
+                          color: FormaColors.concreteGrey),
+                      suffixIcon: _searchController.text.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.clear_rounded, size: 20),
+                              onPressed: () {
+                                _searchController.clear();
+                                setState(() => _currentQuery = '');
+                              },
+                            )
+                          : null,
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 14),
+                    ),
                   ),
                 ),
               ),
-            ),
 
-            // Category Filter Pills
-            SizedBox(
-              height: 44,
-              child: ListView.separated(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                scrollDirection: Axis.horizontal,
-                itemCount: SearchCategory.values.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 8),
-                itemBuilder: (context, index) {
-                  final cat = SearchCategory.values[index];
-                  final isSelected = _selectedCategory == cat;
-                  return FormaBounceable(
-                    onTap: () {
-                      HapticFeedback.selectionClick();
-                      setState(() => _selectedCategory = cat);
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? FormaColors.goldenYellow
-                            : (isDark
-                                ? FormaColors.charcoal
-                                : const Color(0xFFF0EDE5)),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
+              // Category Filter Pills
+              SizedBox(
+                height: 44,
+                child: ListView.separated(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  scrollDirection: Axis.horizontal,
+                  itemCount: SearchCategory.values.length,
+                  separatorBuilder: (_, __) => const SizedBox(width: 8),
+                  itemBuilder: (context, index) {
+                    final cat = SearchCategory.values[index];
+                    final isSelected = _selectedCategory == cat;
+                    return FormaBounceable(
+                      onTap: () {
+                        HapticFeedback.selectionClick();
+                        setState(() => _selectedCategory = cat);
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 6),
+                        decoration: BoxDecoration(
                           color: isSelected
-                              ? Colors.transparent
-                              : (isDark ? Colors.white10 : Colors.black12),
-                        ),
-                      ),
-                      child: Center(
-                        child: Text(
-                          cat.label,
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight:
-                                isSelected ? FontWeight.w800 : FontWeight.w600,
+                              ? FormaColors.goldenYellow
+                              : (isDark
+                                  ? FormaColors.charcoal
+                                  : const Color(0xFFF0EDE5)),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
                             color: isSelected
-                                ? FormaColors.charcoal
-                                : (isDark
-                                    ? FormaColors.darkPrimaryText
-                                    : FormaColors.lightPrimaryText),
+                                ? Colors.transparent
+                                : (isDark ? Colors.white10 : Colors.black12),
+                          ),
+                        ),
+                        child: Center(
+                          child: Text(
+                            cat.label,
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: isSelected
+                                  ? FontWeight.w800
+                                  : FontWeight.w600,
+                              color: isSelected
+                                  ? FormaColors.charcoal
+                                  : (isDark
+                                      ? FormaColors.darkPrimaryText
+                                      : FormaColors.lightPrimaryText),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
-            ),
 
-            const SizedBox(height: 8),
+              const SizedBox(height: 8),
 
-            // Results or Recent Searches
-            Expanded(
-              child: _currentQuery.isEmpty
-                  ? _buildRecentSearches(isDark)
-                  : _buildSearchResults(results, isDark),
-            ),
-          ],
+              // Results or Recent Searches
+              Expanded(
+                child: _currentQuery.isEmpty
+                    ? _buildRecentSearches(isDark)
+                    : _buildSearchResults(results, isDark),
+              ),
+            ],
+          ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
-Widget _buildRecentSearches(bool isDark) {
+  Widget _buildRecentSearches(bool isDark) {
     if (_recentSearches.isEmpty) {
       return Center(
         child: Column(

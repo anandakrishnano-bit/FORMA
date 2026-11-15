@@ -209,7 +209,8 @@ class _LoginScreenState extends State<LoginScreen> {
           errStr.contains('code: 10')) {
         message =
             'Google Sign-In configuration error (ApiException: 10). The release SHA-1 certificate fingerprint is not registered in Firebase Console.';
-      } else if (errStr.contains('network') || errStr.contains('SocketException')) {
+      } else if (errStr.contains('network') ||
+          errStr.contains('SocketException')) {
         message = 'Network error. Please check your internet connection.';
       }
       if (mounted) {
@@ -928,8 +929,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                   height: 24,
                                   child: Checkbox(
                                     value: _termsAccepted,
-                                    onChanged: (val) =>
-                                        setState(() => _termsAccepted = val ?? false),
+                                    onChanged: (val) => setState(
+                                        () => _termsAccepted = val ?? false),
                                     activeColor: FormaColors.primaryAccent,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(4),
@@ -953,17 +954,19 @@ class _LoginScreenState extends State<LoginScreen> {
                                         ),
                                         children: [
                                           WidgetSpan(
-                                            alignment: PlaceholderAlignment.baseline,
+                                            alignment:
+                                                PlaceholderAlignment.baseline,
                                             baseline: TextBaseline.alphabetic,
                                             child: GestureDetector(
-                                              onTap: () =>
-                                                  context.push('/terms-and-conditions'),
+                                              onTap: () => context.push(
+                                                  '/terms-and-conditions'),
                                               child: const Text(
                                                 'Terms and Conditions',
                                                 style: TextStyle(
                                                   fontSize: 13,
                                                   fontWeight: FontWeight.w700,
-                                                  color: FormaColors.primaryAccent,
+                                                  color:
+                                                      FormaColors.primaryAccent,
                                                   decoration:
                                                       TextDecoration.underline,
                                                 ),

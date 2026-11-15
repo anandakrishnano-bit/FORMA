@@ -14,7 +14,8 @@ void main() {
       final md = FormaTermsData.fullTermsMarkdown;
       expect(md.contains('1. About FORMA'), isTrue);
       expect(md.contains('2. Eligibility and accounts'), isTrue);
-      expect(md.contains('3. Health, fitness and nutrition information'), isTrue);
+      expect(
+          md.contains('3. Health, fitness and nutrition information'), isTrue);
       expect(md.contains('4. AI-powered features'), isTrue);
       expect(md.contains('5. Personal expenses and shared expenses'), isTrue);
       expect(md.contains('6. Friends, groups and sharing'), isTrue);
@@ -34,7 +35,8 @@ void main() {
       expect(FormaTermsData.isAcceptanceRequired(null), isTrue);
       expect(FormaTermsData.isAcceptanceRequired(''), isTrue);
       expect(FormaTermsData.isAcceptanceRequired('2025-01-01'), isTrue);
-      expect(FormaTermsData.isAcceptanceRequired(FormaTermsData.currentVersion), isFalse);
+      expect(FormaTermsData.isAcceptanceRequired(FormaTermsData.currentVersion),
+          isFalse);
     });
   });
 }

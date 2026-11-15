@@ -412,9 +412,9 @@ class _FormaUpdateScreenState extends ConsumerState<FormaUpdateScreen> {
                         data: release.releaseNotes,
                         physics: const BouncingScrollPhysics(),
                         padding: EdgeInsets.zero,
-                        styleSheet: MarkdownStyleSheet.fromTheme(
-                                Theme.of(context))
-                            .copyWith(
+                        styleSheet:
+                            MarkdownStyleSheet.fromTheme(Theme.of(context))
+                                .copyWith(
                           p: TextStyle(
                             fontSize: 13,
                             color: primaryTextColor.withValues(alpha: 0.9),

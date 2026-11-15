@@ -110,92 +110,93 @@ class _ActivityCalendarScreenState
                 fontWeight: FontWeight.w800, fontSize: 18),
           ),
           actions: [
-          TextButton.icon(
-            onPressed: _goToToday,
-            icon: const Icon(Icons.today_rounded,
-                size: 16, color: FormaColors.goldenYellow),
-            label: const Text(
-              'Today',
-              style: TextStyle(
-                  fontWeight: FontWeight.w700, color: FormaColors.goldenYellow),
+            TextButton.icon(
+              onPressed: _goToToday,
+              icon: const Icon(Icons.today_rounded,
+                  size: 16, color: FormaColors.goldenYellow),
+              label: const Text(
+                'Today',
+                style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    color: FormaColors.goldenYellow),
+              ),
             ),
-          ),
-          const SizedBox(width: 8),
-        ],
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Month Switcher Header
-              _buildMonthHeader(isDark),
-              const SizedBox(height: 12),
+            const SizedBox(width: 8),
+          ],
+        ),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Month Switcher Header
+                _buildMonthHeader(isDark),
+                const SizedBox(height: 12),
 
-              // Calendar Card
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: isDark ? FormaColors.charcoal : Colors.white,
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(
-                    color: isDark
-                        ? Colors.white10
-                        : FormaColors.divider.withValues(alpha: 0.6),
+                // Calendar Card
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: isDark ? FormaColors.charcoal : Colors.white,
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(
+                      color: isDark
+                          ? Colors.white10
+                          : FormaColors.divider.withValues(alpha: 0.6),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color:
+                            Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color:
-                          Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
+                  child: Column(
+                    children: [
+                      // Weekday Labels
+                      _buildWeekdayLabels(isDark),
+                      const SizedBox(height: 8),
+
+                      // Month Grid
+                      _buildMonthGrid(
+                        isDark: isDark,
+                        workouts: workouts,
+                        expenses: expenses,
+                        summaries: summaries,
+                      ),
+                    ],
+                  ),
                 ),
-                child: Column(
-                  children: [
-                    // Weekday Labels
-                    _buildWeekdayLabels(isDark),
-                    const SizedBox(height: 8),
 
-                    // Month Grid
-                    _buildMonthGrid(
-                      isDark: isDark,
-                      workouts: workouts,
-                      expenses: expenses,
-                      summaries: summaries,
-                    ),
-                  ],
+                const SizedBox(height: 14),
+
+                // Dot Legend Bar
+                _buildDotLegend(isDark),
+
+                const SizedBox(height: 24),
+
+                // Day Breakdown Section
+                _buildDayDetailBreakdown(
+                  selectedDay: _selectedDay,
+                  isDark: isDark,
+                  workouts: workouts,
+                  expenses: expenses,
+                  summaries: summaries,
                 ),
-              ),
 
-              const SizedBox(height: 14),
-
-              // Dot Legend Bar
-              _buildDotLegend(isDark),
-
-              const SizedBox(height: 24),
-
-              // Day Breakdown Section
-              _buildDayDetailBreakdown(
-                selectedDay: _selectedDay,
-                isDark: isDark,
-                workouts: workouts,
-                expenses: expenses,
-                summaries: summaries,
-              ),
-
-              const SizedBox(height: 32),
-            ],
+                const SizedBox(height: 32),
+              ],
+            ),
           ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
-Widget _buildMonthHeader(bool isDark) {
+  Widget _buildMonthHeader(bool isDark) {
     final title = DateFormat('MMMM yyyy').format(_displayedMonth);
 
     return Row(

@@ -13,11 +13,13 @@ void main() {
         'published_at': '2026-11-15T12:00:00Z',
         'draft': false,
         'prerelease': false,
-        'html_url': 'https://github.com/anandakrishnano-bit/FORMA/releases/tag/v1.2.0',
+        'html_url':
+            'https://github.com/anandakrishnano-bit/FORMA/releases/tag/v1.2.0',
         'assets': [
           {
             'name': 'forma-v1.2.0.apk',
-            'browser_download_url': 'https://github.com/anandakrishnano-bit/FORMA/releases/download/v1.2.0/forma-v1.2.0.apk',
+            'browser_download_url':
+                'https://github.com/anandakrishnano-bit/FORMA/releases/download/v1.2.0/forma-v1.2.0.apk',
             'size': 45678901,
           },
         ],
@@ -57,7 +59,8 @@ void main() {
         'minSupportedVersion': '1.5.0',
       };
 
-      final mockChecksumText = 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 forma-v2.0.0.apk';
+      final mockChecksumText =
+          'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 forma-v2.0.0.apk';
 
       final release = AppReleaseInfo.fromGitHubRelease(
         mockReleaseJson,
@@ -68,7 +71,8 @@ void main() {
       expect(release.versionCode, 10);
       expect(release.priority, UpdatePriority.critical);
       expect(release.minSupportedVersion, '1.5.0');
-      expect(release.sha256Checksum, 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855');
+      expect(release.sha256Checksum,
+          'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855');
     });
 
     test('Semantic version comparisons work accurately', () {

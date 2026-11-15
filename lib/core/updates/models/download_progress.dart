@@ -79,7 +79,8 @@ class DownloadProgress {
     );
   }
 
-  factory DownloadProgress.ready({required String filePath, required int total}) {
+  factory DownloadProgress.ready(
+      {required String filePath, required int total}) {
     return DownloadProgress(
       status: DownloadStatus.readyToInstall,
       receivedBytes: total,

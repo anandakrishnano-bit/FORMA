@@ -9,9 +9,11 @@ class GitHubReleaseService {
   // Central GitHub Repository Configuration
   static const String repositoryOwner = 'anandakrishnano-bit';
   static const String repositoryName = 'FORMA';
-  static const String _apiBaseUrl = 'https://api.github.com/repos/$repositoryOwner/$repositoryName';
+  static const String _apiBaseUrl =
+      'https://api.github.com/repos/$repositoryOwner/$repositoryName';
 
-  GitHubReleaseService({http.Client? client}) : _client = client ?? http.Client();
+  GitHubReleaseService({http.Client? client})
+      : _client = client ?? http.Client();
 
   /// Fetches the latest published stable release from GitHub Releases.
   /// Ignores draft releases and prereleases.
@@ -28,7 +30,8 @@ class GitHubReleaseService {
       ).timeout(const Duration(seconds: 12));
 
       if (response.statusCode == 200) {
-        final List<dynamic> releasesList = jsonDecode(response.body) as List<dynamic>;
+        final List<dynamic> releasesList =
+            jsonDecode(response.body) as List<dynamic>;
         if (releasesList.isEmpty) return null;
 
         // Iterate to find the newest non-draft, non-prerelease containing an APK asset
@@ -58,7 +61,8 @@ class GitHubReleaseService {
 
             if (name == 'release-metadata.json' && downloadUrl.isNotEmpty) {
               metadataJson = await _fetchJsonAsset(downloadUrl);
-            } else if ((name.contains('sha256') || name.contains('checksum')) && downloadUrl.isNotEmpty) {
+            } else if ((name.contains('sha256') || name.contains('checksum')) &&
+                downloadUrl.isNotEmpty) {
               checksumText = await _fetchTextAsset(downloadUrl);
             }
           }
@@ -76,20 +80,24 @@ class GitHubReleaseService {
         }
         return null;
       } else if (response.statusCode == 403 || response.statusCode == 429) {
-        throw const FormatException('GitHub update service is currently rate limited. Please try again later.');
+        throw const FormatException(
+            'GitHub update service is currently rate limited. Please try again later.');
       } else if (response.statusCode == 404) {
         return null; // No releases published yet
       } else {
-        throw FormatException('Update check failed with server status ${response.statusCode}.');
+        throw FormatException(
+            'Update check failed with server status ${response.statusCode}.');
       }
     } on http.ClientException {
-      throw const FormatException('Network connection error while checking for updates.');
+      throw const FormatException(
+          'Network connection error while checking for updates.');
     }
   }
 
   Future<Map<String, dynamic>?> _fetchJsonAsset(String url) async {
     try {
-      final res = await _client.get(Uri.parse(url)).timeout(const Duration(seconds: 8));
+      final res =
+          await _client.get(Uri.parse(url)).timeout(const Duration(seconds: 8));
       if (res.statusCode == 200) {
         return jsonDecode(res.body) as Map<String, dynamic>?;
       }
@@ -99,7 +107,8 @@ class GitHubReleaseService {
 
   Future<String?> _fetchTextAsset(String url) async {
     try {
-      final res = await _client.get(Uri.parse(url)).timeout(const Duration(seconds: 8));
+      final res =
+          await _client.get(Uri.parse(url)).timeout(const Duration(seconds: 8));
       if (res.statusCode == 200) {
         return res.body;
       }

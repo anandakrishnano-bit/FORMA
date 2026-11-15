@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -70,25 +71,40 @@ class _AvatarPickerScreenState extends ConsumerState<AvatarPickerScreen> {
     try {
       String finalPhotoUrl = _selectedAvatarKey ?? '';
 
-      // If user uploaded a new local file, upload to Firebase Storage under users/{uid}/profile/
+      // If user uploaded a new local file, attempt upload to Firebase Storage under users/{uid}/profile/
       if (_localImageFile != null) {
-        final storageRef = FirebaseStorage.instance
-            .ref()
-            .child('users')
-            .child(user.uid)
-            .child('profile')
-            .child('avatar_${DateTime.now().millisecondsSinceEpoch}.jpg');
+        try {
+          final storageRef = FirebaseStorage.instance
+              .ref()
+              .child('users')
+              .child(user.uid)
+              .child('profile')
+              .child('avatar_${DateTime.now().millisecondsSinceEpoch}.jpg');
 
-        final uploadTask = await storageRef.putFile(
-          _localImageFile!,
-          SettableMetadata(contentType: 'image/jpeg'),
-        );
-        finalPhotoUrl = await uploadTask.ref.getDownloadURL();
+          final uploadTask = await storageRef
+              .putFile(
+                _localImageFile!,
+                SettableMetadata(contentType: 'image/jpeg'),
+              )
+              .timeout(const Duration(seconds: 12));
+          finalPhotoUrl = await uploadTask.ref.getDownloadURL();
+        } catch (storageError) {
+          debugPrint(
+              'Firebase Storage upload unavailable ($storageError). Storing directly in user profile as Base64 data.');
+          final bytes = await _localImageFile!.readAsBytes();
+          final base64String = base64Encode(bytes);
+          finalPhotoUrl = 'data:image/jpeg;base64,$base64String';
+        }
       }
 
-      // Update Firebase Auth user
-      await user.updatePhotoURL(finalPhotoUrl.isEmpty ? null : finalPhotoUrl);
-      await user.reload();
+      // Update Firebase Auth user (if finalPhotoUrl is a standard URL; Base64 data URLs exceed Firebase Auth's 2048 character photoURL limit)
+      try {
+        if (!finalPhotoUrl.startsWith('data:')) {
+          await user
+              .updatePhotoURL(finalPhotoUrl.isEmpty ? null : finalPhotoUrl);
+          await user.reload();
+        }
+      } catch (_) {}
 
       // Update Firestore user document with multi-field compatibility
       await FirebaseFirestore.instance.collection('users').doc(user.uid).set({

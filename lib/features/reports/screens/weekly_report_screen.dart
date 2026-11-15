@@ -100,67 +100,67 @@ Tracked with FORMA.
             style: GoogleFonts.plusJakartaSans(
                 fontWeight: FontWeight.w800, fontSize: 18),
           ),
-        actions: [
-          reportAsync.when(
-            data: (report) => IconButton(
-              icon: const Icon(Icons.share_rounded, size: 20),
-              onPressed: () => _shareReport(report),
-              tooltip: 'Share Report',
+          actions: [
+            reportAsync.when(
+              data: (report) => IconButton(
+                icon: const Icon(Icons.share_rounded, size: 20),
+                onPressed: () => _shareReport(report),
+                tooltip: 'Share Report',
+              ),
+              loading: () => const SizedBox.shrink(),
+              error: (_, __) => const SizedBox.shrink(),
             ),
-            loading: () => const SizedBox.shrink(),
-            error: (_, __) => const SizedBox.shrink(),
-          ),
-          const SizedBox(width: 8),
-        ],
-      ),
-      body: SafeArea(
-        child: reportAsync.when(
-          data: (report) => _buildReportContent(report, isDark),
-          loading: () => const Center(
-            child: CircularProgressIndicator(color: FormaColors.goldenYellow),
-          ),
-          error: (err, _) => Center(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.error_outline_rounded,
-                      size: 48, color: FormaColors.coralPink),
-                  const SizedBox(height: 12),
-                  Text(
-                    'Could not generate report',
-                    style: GoogleFonts.plusJakartaSans(
-                        fontSize: 16, fontWeight: FontWeight.w800),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    err.toString(),
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: isDark
-                          ? FormaColors.darkSecondaryText
-                          : FormaColors.lightSecondaryText,
+            const SizedBox(width: 8),
+          ],
+        ),
+        body: SafeArea(
+          child: reportAsync.when(
+            data: (report) => _buildReportContent(report, isDark),
+            loading: () => const Center(
+              child: CircularProgressIndicator(color: FormaColors.goldenYellow),
+            ),
+            error: (err, _) => Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.error_outline_rounded,
+                        size: 48, color: FormaColors.coralPink),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Could not generate report',
+                      style: GoogleFonts.plusJakartaSans(
+                          fontSize: 16, fontWeight: FontWeight.w800),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () =>
-                        ref.invalidate(currentWeeklyReportProvider),
-                    child: const Text('Retry'),
-                  ),
-                ],
+                    const SizedBox(height: 6),
+                    Text(
+                      err.toString(),
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: isDark
+                            ? FormaColors.darkSecondaryText
+                            : FormaColors.lightSecondaryText,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () =>
+                          ref.invalidate(currentWeeklyReportProvider),
+                      child: const Text('Retry'),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
-Widget _buildReportContent(WeeklyReport report, bool isDark) {
+  Widget _buildReportContent(WeeklyReport report, bool isDark) {
     final rangeStr =
         '${DateFormat('d MMMM').format(report.startDate)} – ${DateFormat('d MMMM yyyy').format(report.endDate)}';
 

@@ -8,7 +8,8 @@ import 'package:forma/core/updates/services/apk_download_service.dart';
 import 'package:forma/core/updates/services/app_update_platform_service.dart';
 import 'package:forma/core/updates/services/github_release_service.dart';
 
-final appUpdatePlatformServiceProvider = Provider<AppUpdatePlatformService>((ref) {
+final appUpdatePlatformServiceProvider =
+    Provider<AppUpdatePlatformService>((ref) {
   return AppUpdatePlatformService();
 });
 
@@ -20,11 +21,13 @@ final apkDownloadServiceProvider = Provider<ApkDownloadService>((ref) {
   return ApkDownloadService();
 });
 
-final updateCheckStateProvider = StateNotifierProvider<UpdateCheckNotifier, UpdateCheckResult>((ref) {
+final updateCheckStateProvider =
+    StateNotifierProvider<UpdateCheckNotifier, UpdateCheckResult>((ref) {
   return UpdateCheckNotifier(ref);
 });
 
-final downloadProgressStateProvider = StateNotifierProvider<DownloadProgressNotifier, DownloadProgress>((ref) {
+final downloadProgressStateProvider =
+    StateNotifierProvider<DownloadProgressNotifier, DownloadProgress>((ref) {
   return DownloadProgressNotifier(ref.watch(apkDownloadServiceProvider));
 });
 
@@ -78,7 +81,8 @@ class UpdateCheckNotifier extends StateNotifier<UpdateCheckResult> {
 
     try {
       final latest = await github.fetchLatestRelease();
-      await prefs.setInt(_keyLastChecked, DateTime.now().millisecondsSinceEpoch);
+      await prefs.setInt(
+          _keyLastChecked, DateTime.now().millisecondsSinceEpoch);
 
       if (latest == null) {
         final result = UpdateCheckResult.upToDate(
@@ -113,7 +117,10 @@ class UpdateCheckNotifier extends StateNotifier<UpdateCheckResult> {
       final result = UpdateCheckResult.error(
         currentVersion: currentVersion,
         currentVersionCode: currentCode,
-        error: e.toString().replaceAll('Exception: ', '').replaceAll('FormatException: ', ''),
+        error: e
+            .toString()
+            .replaceAll('Exception: ', '')
+            .replaceAll('FormatException: ', ''),
       );
       state = result;
       return result;
@@ -138,11 +145,13 @@ class DownloadProgressNotifier extends StateNotifier<DownloadProgress> {
   final ApkDownloadService _downloadService;
   StreamSubscription<DownloadProgress>? _subscription;
 
-  DownloadProgressNotifier(this._downloadService) : super(DownloadProgress.idle());
+  DownloadProgressNotifier(this._downloadService)
+      : super(DownloadProgress.idle());
 
   void startDownload(AppReleaseInfo release) {
     _subscription?.cancel();
-    state = DownloadProgress.downloading(received: 0, total: release.apkSizeBytes, speed: 0);
+    state = DownloadProgress.downloading(
+        received: 0, total: release.apkSizeBytes, speed: 0);
 
     _subscription = _downloadService.downloadApk(release).listen(
       (progress) {

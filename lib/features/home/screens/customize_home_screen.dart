@@ -47,97 +47,100 @@ class CustomizeHomeScreen extends ConsumerWidget {
                 fontWeight: FontWeight.w800, fontSize: 18),
           ),
           actions: [
-          TextButton(
-            onPressed: () async {
-              HapticFeedback.mediumImpact();
-              await ref.read(homeCardConfigsProvider.notifier).resetToDefault();
-              if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Layout reset to default.'),
-                    duration: Duration(seconds: 2),
-                    backgroundColor: FormaColors.charcoal,
-                  ),
-                );
-              }
-            },
-            child: const Text(
-              'Reset',
-              style: TextStyle(
-                  fontWeight: FontWeight.w700, color: FormaColors.coralPink),
-            ),
-          ),
-          const SizedBox(width: 8),
-        ],
-      ),
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Organize Your Dashboard',
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
-                      color: isDark
-                          ? FormaColors.darkPrimaryText
-                          : FormaColors.lightPrimaryText,
+            TextButton(
+              onPressed: () async {
+                HapticFeedback.mediumImpact();
+                await ref
+                    .read(homeCardConfigsProvider.notifier)
+                    .resetToDefault();
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Layout reset to default.'),
+                      duration: Duration(seconds: 2),
+                      backgroundColor: FormaColors.charcoal,
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Drag the handle on any card to reposition it, or toggle visibility to keep your home feed focused.',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: isDark
-                          ? FormaColors.darkSecondaryText
-                          : FormaColors.lightSecondaryText,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: ReorderableListView.builder(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                itemCount: cards.length,
-                // ignore: deprecated_member_use
-                onReorder: (oldIndex, newIndex) {
-                  HapticFeedback.lightImpact();
-                  ref
-                      .read(homeCardConfigsProvider.notifier)
-                      .reorder(oldIndex, newIndex);
-                },
-                itemBuilder: (context, index) {
-                  final card = cards[index];
-                  return _buildCardItem(
-                    key: ValueKey(card.id),
-                    card: card,
-                    isDark: isDark,
-                    onToggle: () {
-                      HapticFeedback.selectionClick();
-                      ref
-                          .read(homeCardConfigsProvider.notifier)
-                          .toggleVisibility(card.id);
-                    },
                   );
-                },
+                }
+              },
+              child: const Text(
+                'Reset',
+                style: TextStyle(
+                    fontWeight: FontWeight.w700, color: FormaColors.coralPink),
               ),
             ),
+            const SizedBox(width: 8),
           ],
         ),
+        body: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Organize Your Dashboard',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                        color: isDark
+                            ? FormaColors.darkPrimaryText
+                            : FormaColors.lightPrimaryText,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Drag the handle on any card to reposition it, or toggle visibility to keep your home feed focused.',
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: isDark
+                            ? FormaColors.darkSecondaryText
+                            : FormaColors.lightSecondaryText,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: ReorderableListView.builder(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  itemCount: cards.length,
+                  // ignore: deprecated_member_use
+                  onReorder: (oldIndex, newIndex) {
+                    HapticFeedback.lightImpact();
+                    ref
+                        .read(homeCardConfigsProvider.notifier)
+                        .reorder(oldIndex, newIndex);
+                  },
+                  itemBuilder: (context, index) {
+                    final card = cards[index];
+                    return _buildCardItem(
+                      key: ValueKey(card.id),
+                      card: card,
+                      isDark: isDark,
+                      onToggle: () {
+                        HapticFeedback.selectionClick();
+                        ref
+                            .read(homeCardConfigsProvider.notifier)
+                            .toggleVisibility(card.id);
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 
-Widget _buildCardItem({
+  Widget _buildCardItem({
     required Key key,
     required HomeCardConfig card,
     required bool isDark,

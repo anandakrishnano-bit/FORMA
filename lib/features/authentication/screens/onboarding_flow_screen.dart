@@ -207,7 +207,8 @@ class _OnboardingFlowScreenState extends ConsumerState<OnboardingFlowScreen> {
           errStr.contains('code: 10')) {
         message =
             'Google Sign-In configuration error (ApiException: 10). The release SHA-1 certificate fingerprint is not registered in Firebase Console.';
-      } else if (errStr.contains('network') || errStr.contains('SocketException')) {
+      } else if (errStr.contains('network') ||
+          errStr.contains('SocketException')) {
         message = 'Could not connect. Please check your internet connection.';
       }
       if (mounted) {

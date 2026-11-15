@@ -192,8 +192,7 @@ class _SettleUpScreenState extends ConsumerState<SettleUpScreen> {
                       width: 40,
                       height: 4,
                       decoration: BoxDecoration(
-                        color:
-                            FormaColors.concreteGrey.withValues(alpha: 0.4),
+                        color: FormaColors.concreteGrey.withValues(alpha: 0.4),
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
@@ -279,8 +278,7 @@ class _SettleUpScreenState extends ConsumerState<SettleUpScreen> {
                                       _recipientUid = bal.participantUid;
                                       _recipientName = bal.displayName;
                                       _recipientPhotoUrl = bal.photoUrl;
-                                      _outstandingAmount =
-                                          bal.netBalance.abs();
+                                      _outstandingAmount = bal.netBalance.abs();
                                       _iAmPayer = bal.youOwe;
                                       if (_outstandingAmount > 0) {
                                         _amountNotifier.value =
@@ -302,8 +300,7 @@ class _SettleUpScreenState extends ConsumerState<SettleUpScreen> {
                                           ? FormaColors.primaryAccent
                                               .withValues(alpha: 0.18)
                                           : cardBg,
-                                      borderRadius:
-                                          BorderRadius.circular(16),
+                                      borderRadius: BorderRadius.circular(16),
                                       border: Border.all(
                                         color: isSelected
                                             ? FormaColors.primaryAccent
@@ -346,7 +343,8 @@ class _SettleUpScreenState extends ConsumerState<SettleUpScreen> {
                                                   color: bal.youAreOwed
                                                       ? FormaColors.success
                                                       : (bal.youOwe
-                                                          ? FormaColors.coralPink
+                                                          ? FormaColors
+                                                              .coralPink
                                                           : secondaryTextColor),
                                                 ),
                                               ),
@@ -354,10 +352,8 @@ class _SettleUpScreenState extends ConsumerState<SettleUpScreen> {
                                           ),
                                         ),
                                         if (isSelected)
-                                          const Icon(
-                                              Icons.check_circle_rounded,
-                                              color:
-                                                  FormaColors.primaryAccent),
+                                          const Icon(Icons.check_circle_rounded,
+                                              color: FormaColors.primaryAccent),
                                       ],
                                     ),
                                   ),
@@ -400,12 +396,12 @@ class _SettleUpScreenState extends ConsumerState<SettleUpScreen> {
                                             orElse: () => null,
                                           );
                                       if (b != null) {
-                                        _outstandingAmount =
-                                            b.netBalance.abs();
+                                        _outstandingAmount = b.netBalance.abs();
                                         _iAmPayer = b.youOwe;
                                         if (_outstandingAmount > 0) {
                                           _amountNotifier.value =
-                                              _outstandingAmount.toStringAsFixed(
+                                              _outstandingAmount
+                                                  .toStringAsFixed(
                                             _outstandingAmount
                                                         .truncateToDouble() ==
                                                     _outstandingAmount
@@ -426,8 +422,7 @@ class _SettleUpScreenState extends ConsumerState<SettleUpScreen> {
                                           ? FormaColors.primaryAccent
                                               .withValues(alpha: 0.18)
                                           : cardBg,
-                                      borderRadius:
-                                          BorderRadius.circular(16),
+                                      borderRadius: BorderRadius.circular(16),
                                       border: Border.all(
                                         color: isSelected
                                             ? FormaColors.primaryAccent
@@ -440,8 +435,7 @@ class _SettleUpScreenState extends ConsumerState<SettleUpScreen> {
                                     child: Row(
                                       children: [
                                         FormaAvatar(
-                                          photoUrl:
-                                              f.photoUrl ?? f.avatarUrl,
+                                          photoUrl: f.photoUrl ?? f.avatarUrl,
                                           name: f.displayName,
                                           size: 40,
                                         ),
@@ -470,10 +464,8 @@ class _SettleUpScreenState extends ConsumerState<SettleUpScreen> {
                                           ),
                                         ),
                                         if (isSelected)
-                                          const Icon(
-                                              Icons.check_circle_rounded,
-                                              color:
-                                                  FormaColors.primaryAccent),
+                                          const Icon(Icons.check_circle_rounded,
+                                              color: FormaColors.primaryAccent),
                                       ],
                                     ),
                                   ),
@@ -515,8 +507,7 @@ class _SettleUpScreenState extends ConsumerState<SettleUpScreen> {
                                     style: TextStyle(
                                         fontSize: 14, color: primaryTextColor),
                                     decoration: InputDecoration(
-                                      hintText:
-                                          'Enter person name (e.g. Mike)',
+                                      hintText: 'Enter person name (e.g. Mike)',
                                       hintStyle: TextStyle(
                                           fontSize: 13,
                                           color: secondaryTextColor),
@@ -612,586 +603,589 @@ class _SettleUpScreenState extends ConsumerState<SettleUpScreen> {
           ),
           title: Text(
             'Record Settlement',
-          style: GoogleFonts.plusJakartaSans(
-            fontSize: 20,
-            fontWeight: FontWeight.w800,
-            color: primaryTextColor,
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 20,
+              fontWeight: FontWeight.w800,
+              color: primaryTextColor,
+            ),
           ),
-        ),
-        centerTitle: false,
-        actions: [
-          TextButton(
-            onPressed: _isSaving ? null : _recordSettlement,
-            child: _isSaving
-                ? const SizedBox(
-                    width: 18,
-                    height: 18,
-                    child: CircularProgressIndicator(
-                        strokeWidth: 2, color: FormaColors.primaryAccent),
-                  )
-                : Text(
-                    'Confirm',
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w800,
-                      color: FormaColors.primaryAccent,
+          centerTitle: false,
+          actions: [
+            TextButton(
+              onPressed: _isSaving ? null : _recordSettlement,
+              child: _isSaving
+                  ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2, color: FormaColors.primaryAccent),
+                    )
+                  : Text(
+                      'Confirm',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                        color: FormaColors.primaryAccent,
+                      ),
                     ),
-                  ),
-          ),
-        ],
-      ),
-      body: SafeArea(
-        child: GestureDetector(
-          onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-          behavior: HitTestBehavior.translucent,
-          child: Column(
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (_errorMessage != null) ...[
+            ),
+          ],
+        ),
+        body: SafeArea(
+          child: GestureDetector(
+            onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+            behavior: HitTestBehavior.translucent,
+            child: Column(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (_errorMessage != null) ...[
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            margin: const EdgeInsets.only(bottom: 16),
+                            decoration: BoxDecoration(
+                              color:
+                                  FormaColors.coralPink.withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(color: FormaColors.coralPink),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.error_outline_rounded,
+                                    color: FormaColors.coralPink, size: 20),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    _errorMessage!,
+                                    style: const TextStyle(
+                                        color: FormaColors.coralPink,
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+
+                        // 1. Amount Display Card
                         Container(
-                          padding: const EdgeInsets.all(12),
-                          margin: const EdgeInsets.only(bottom: 16),
-                          decoration: BoxDecoration(
-                            color:
-                                FormaColors.coralPink.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(color: FormaColors.coralPink),
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(Icons.error_outline_rounded,
-                                  color: FormaColors.coralPink, size: 20),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  _errorMessage!,
-                                  style: const TextStyle(
-                                      color: FormaColors.coralPink,
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w600),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-
-                      // 1. Amount Display Card
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 24, horizontal: 20),
-                        decoration: BoxDecoration(
-                          color: cardBg,
-                          borderRadius: BorderRadius.circular(28),
-                          border: Border.all(
-                            color: isDark
-                                ? Colors.white10
-                                : FormaColors.divider.withValues(alpha: 0.6),
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black
-                                  .withValues(alpha: isDark ? 0.25 : 0.04),
-                              blurRadius: 16,
-                              offset: const Offset(0, 6),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          children: [
-                            Text(
-                              'SETTLEMENT PAYMENT AMOUNT',
-                              style: GoogleFonts.plusJakartaSans(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: 1.5,
-                                color: secondaryTextColor,
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            ValueListenableBuilder<String>(
-                              valueListenable: _amountNotifier,
-                              builder: (context, value, _) {
-                                final displayAmount =
-                                    value.isEmpty ? '0' : value;
-                                return Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.baseline,
-                                  textBaseline: TextBaseline.alphabetic,
-                                  children: [
-                                    Text(
-                                      '₹',
-                                      style: GoogleFonts.plusJakartaSans(
-                                        fontSize: 32,
-                                        fontWeight: FontWeight.w700,
-                                        color: FormaColors.goldenYellow,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      displayAmount,
-                                      style: GoogleFonts.plusJakartaSans(
-                                        fontSize: 50,
-                                        fontWeight: FontWeight.w900,
-                                        letterSpacing: -1.2,
-                                        color: value.isEmpty
-                                            ? secondaryTextColor.withValues(
-                                                alpha: 0.5)
-                                            : primaryTextColor,
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              },
-                            ),
-                            if (_outstandingAmount > 0) ...[
-                              const SizedBox(height: 10),
-                              Text(
-                                'Outstanding: ₹${_outstandingAmount.toStringAsFixed(0)} • Remaining after: ₹${remainingAfterPayment.toStringAsFixed(0)}',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: remainingAfterPayment == 0
-                                      ? FormaColors.success
-                                      : secondaryTextColor,
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
-
-                      const SizedBox(height: 18),
-
-                      // 2. Direction & Member Selector
-                      Text(
-                        'Settlement Direction',
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w800,
-                          color: primaryTextColor,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: FormaBounceable(
-                              onTap: () => setState(() => _iAmPayer = true),
-                              child: Container(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 12),
-                                decoration: BoxDecoration(
-                                  color: _iAmPayer
-                                      ? FormaColors.primaryAccent
-                                      : cardBg,
-                                  borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(
-                                    color: _iAmPayer
-                                        ? FormaColors.primaryAccent
-                                        : (isDark
-                                            ? Colors.white10
-                                            : FormaColors.divider),
-                                  ),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    'You paid them',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w800,
-                                      fontSize: 13,
-                                      color: _iAmPayer
-                                          ? FormaColors.charcoal
-                                          : primaryTextColor,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: FormaBounceable(
-                              onTap: () => setState(() => _iAmPayer = false),
-                              child: Container(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 12),
-                                decoration: BoxDecoration(
-                                  color: !_iAmPayer
-                                      ? FormaColors.primaryAccent
-                                      : cardBg,
-                                  borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(
-                                    color: !_iAmPayer
-                                        ? FormaColors.primaryAccent
-                                        : (isDark
-                                            ? Colors.white10
-                                            : FormaColors.divider),
-                                  ),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    'They paid you',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w800,
-                                      fontSize: 13,
-                                      color: !_iAmPayer
-                                          ? FormaColors.charcoal
-                                          : primaryTextColor,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 18),
-
-                      // 3. Member Selector
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Other Participant',
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w800,
-                              color: primaryTextColor,
-                            ),
-                          ),
-                          TextButton.icon(
-                            onPressed: () => _openParticipantPicker(context),
-                            icon: const Icon(Icons.people_outline_rounded,
-                                size: 16, color: FormaColors.primaryAccent),
-                            label: Text(
-                              _recipientUid.isEmpty
-                                  ? 'Select Person'
-                                  : 'Change',
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w700,
-                                color: FormaColors.primaryAccent,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 6),
-                      // Prominent Interactive Participant Card
-                      FormaBounceable(
-                        onTap: () => _openParticipantPicker(context),
-                        child: Container(
+                          width: double.infinity,
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 14),
+                              vertical: 24, horizontal: 20),
                           decoration: BoxDecoration(
                             color: cardBg,
-                            borderRadius: BorderRadius.circular(18),
+                            borderRadius: BorderRadius.circular(28),
                             border: Border.all(
-                              color: _recipientUid.isNotEmpty
-                                  ? FormaColors.primaryAccent
-                                  : (isDark
-                                      ? Colors.white12
-                                      : FormaColors.divider),
-                              width: _recipientUid.isNotEmpty ? 1.5 : 1,
+                              color: isDark
+                                  ? Colors.white10
+                                  : FormaColors.divider.withValues(alpha: 0.6),
                             ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black
+                                    .withValues(alpha: isDark ? 0.25 : 0.04),
+                                blurRadius: 16,
+                                offset: const Offset(0, 6),
+                              ),
+                            ],
                           ),
-                          child: Row(
+                          child: Column(
                             children: [
-                              if (_recipientUid.isNotEmpty) ...[
-                                FormaAvatar(
-                                  photoUrl: _recipientPhotoUrl,
-                                  name: _recipientName,
-                                  size: 42,
+                              Text(
+                                'SETTLEMENT PAYMENT AMOUNT',
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 1.5,
+                                  color: secondaryTextColor,
                                 ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
+                              ),
+                              const SizedBox(height: 10),
+                              ValueListenableBuilder<String>(
+                                valueListenable: _amountNotifier,
+                                builder: (context, value, _) {
+                                  final displayAmount =
+                                      value.isEmpty ? '0' : value;
+                                  return Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                        CrossAxisAlignment.baseline,
+                                    textBaseline: TextBaseline.alphabetic,
                                     children: [
                                       Text(
-                                        _recipientName,
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w800,
-                                          color: primaryTextColor,
+                                        '₹',
+                                        style: GoogleFonts.plusJakartaSans(
+                                          fontSize: 32,
+                                          fontWeight: FontWeight.w700,
+                                          color: FormaColors.goldenYellow,
                                         ),
                                       ),
+                                      const SizedBox(width: 6),
                                       Text(
-                                        _outstandingAmount > 0
-                                            ? (_iAmPayer
-                                                ? 'You owe them ₹${_outstandingAmount.toStringAsFixed(0)}'
-                                                : 'They owe you ₹${_outstandingAmount.toStringAsFixed(0)}')
-                                            : 'No outstanding debt • Tap to change',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: _outstandingAmount > 0
-                                              ? (_iAmPayer
-                                                  ? FormaColors.coralPink
-                                                  : FormaColors.success)
-                                              : secondaryTextColor,
-                                          fontWeight: FontWeight.w600,
+                                        displayAmount,
+                                        style: GoogleFonts.plusJakartaSans(
+                                          fontSize: 50,
+                                          fontWeight: FontWeight.w900,
+                                          letterSpacing: -1.2,
+                                          color: value.isEmpty
+                                              ? secondaryTextColor.withValues(
+                                                  alpha: 0.5)
+                                              : primaryTextColor,
                                         ),
                                       ),
                                     ],
+                                  );
+                                },
+                              ),
+                              if (_outstandingAmount > 0) ...[
+                                const SizedBox(height: 10),
+                                Text(
+                                  'Outstanding: ₹${_outstandingAmount.toStringAsFixed(0)} • Remaining after: ₹${remainingAfterPayment.toStringAsFixed(0)}',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: remainingAfterPayment == 0
+                                        ? FormaColors.success
+                                        : secondaryTextColor,
                                   ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 6),
-                                  decoration: BoxDecoration(
-                                    color: FormaColors.primaryAccent
-                                        .withValues(alpha: 0.15),
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: const Icon(
-                                    Icons.swap_horiz_rounded,
-                                    color: FormaColors.primaryAccent,
-                                    size: 18,
-                                  ),
-                                ),
-                              ] else ...[
-                                Container(
-                                  width: 42,
-                                  height: 42,
-                                  decoration: BoxDecoration(
-                                    color: FormaColors.primaryAccent
-                                        .withValues(alpha: 0.15),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Icon(
-                                    Icons.person_add_rounded,
-                                    color: FormaColors.primaryAccent,
-                                    size: 20,
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Select Person to Settle With',
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w800,
-                                          color: primaryTextColor,
-                                        ),
-                                      ),
-                                      Text(
-                                        'Tap here to choose from friends or open balances',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: secondaryTextColor,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const Icon(
-                                  Icons.chevron_right_rounded,
-                                  color: FormaColors.primaryAccent,
                                 ),
                               ],
                             ],
                           ),
                         ),
-                      ),
-                      if (balances.isNotEmpty) ...[
-                        const SizedBox(height: 10),
-                        SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          physics: const BouncingScrollPhysics(),
-                          child: Row(
-                            children: [
-                              ...balances.map((bal) {
-                                final isSel =
-                                    _recipientUid == bal.participantUid;
-                                return Padding(
-                                  padding: const EdgeInsets.only(right: 8),
-                                  child: FormaBounceable(
-                                    onTap: () {
-                                      setState(() {
-                                        _recipientUid = bal.participantUid;
-                                        _recipientName = bal.displayName;
-                                        _recipientPhotoUrl = bal.photoUrl;
-                                        _outstandingAmount =
-                                            bal.netBalance.abs();
-                                        _iAmPayer = bal.youOwe;
-                                        _amountNotifier.value =
-                                            _outstandingAmount > 0
-                                                ? _outstandingAmount
-                                                    .toStringAsFixed(
-                                                        _outstandingAmount
-                                                                    .truncateToDouble() ==
-                                                                _outstandingAmount
-                                                            ? 0
-                                                            : 2)
-                                                : '';
-                                        _errorMessage = null;
-                                      });
-                                    },
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 12, vertical: 8),
-                                      decoration: BoxDecoration(
-                                        color: isSel
-                                            ? FormaColors.primaryAccent
-                                                .withValues(alpha: 0.25)
-                                            : cardBg,
-                                        borderRadius:
-                                            BorderRadius.circular(14),
-                                        border: Border.all(
-                                          color: isSel
-                                              ? FormaColors.primaryAccent
-                                              : (isDark
-                                                  ? Colors.white10
-                                                  : FormaColors.divider),
-                                          width: isSel ? 2 : 1,
-                                        ),
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          FormaAvatar(
-                                            photoUrl: bal.photoUrl,
-                                            name: bal.displayName,
-                                            size: 22,
-                                          ),
-                                          const SizedBox(width: 8),
-                                          Text(
-                                            bal.displayName,
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              fontWeight: isSel
-                                                  ? FontWeight.w800
-                                                  : FontWeight.w600,
-                                              color: primaryTextColor,
-                                            ),
-                                          ),
-                                          if (bal.netBalance.abs() > 0) ...[
-                                            const SizedBox(width: 4),
-                                            Text(
-                                              '₹${bal.netBalance.abs().toStringAsFixed(0)}',
-                                              style: TextStyle(
-                                                fontSize: 11,
-                                                fontWeight: FontWeight.w700,
-                                                color: bal.youAreOwed
-                                                    ? FormaColors.success
-                                                    : FormaColors.coralPink,
-                                              ),
-                                            ),
-                                          ],
-                                        ],
+
+                        const SizedBox(height: 18),
+
+                        // 2. Direction & Member Selector
+                        Text(
+                          'Settlement Direction',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w800,
+                            color: primaryTextColor,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: FormaBounceable(
+                                onTap: () => setState(() => _iAmPayer = true),
+                                child: Container(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 12),
+                                  decoration: BoxDecoration(
+                                    color: _iAmPayer
+                                        ? FormaColors.primaryAccent
+                                        : cardBg,
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(
+                                      color: _iAmPayer
+                                          ? FormaColors.primaryAccent
+                                          : (isDark
+                                              ? Colors.white10
+                                              : FormaColors.divider),
+                                    ),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      'You paid them',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w800,
+                                        fontSize: 13,
+                                        color: _iAmPayer
+                                            ? FormaColors.charcoal
+                                            : primaryTextColor,
                                       ),
                                     ),
                                   ),
-                                );
-                              }),
-                            ],
-                          ),
-                        ),
-                      ],
-
-                      const SizedBox(height: 18),
-
-                      // 4. Note
-                      Text(
-                        'Payment Method or Note',
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w800,
-                          color: primaryTextColor,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      TextField(
-                        controller: _noteController,
-                        style: TextStyle(fontSize: 14, color: primaryTextColor),
-                        decoration: InputDecoration(
-                          hintText: 'e.g. Paid via UPI / Cash / Google Pay',
-                          hintStyle: TextStyle(
-                              color: secondaryTextColor.withValues(alpha: 0.6)),
-                          filled: true,
-                          fillColor: cardBg,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(18),
-                            borderSide: BorderSide(
-                                color: isDark
-                                    ? Colors.white10
-                                    : FormaColors.divider),
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 16),
-                      // Clarification note
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: FormaColors.icyBlue.withValues(alpha: 0.12),
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.info_outline_rounded,
-                                size: 18, color: FormaColors.icyBlue),
-                            const SizedBox(width: 8),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
                             Expanded(
-                              child: Text(
-                                'FORMA records offline and peer payments. No bank credentials or financial transactions are handled.',
-                                style: TextStyle(
-                                    fontSize: 11,
-                                    color: isDark
-                                        ? Colors.white70
-                                        : FormaColors.charcoal),
+                              child: FormaBounceable(
+                                onTap: () => setState(() => _iAmPayer = false),
+                                child: Container(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 12),
+                                  decoration: BoxDecoration(
+                                    color: !_iAmPayer
+                                        ? FormaColors.primaryAccent
+                                        : cardBg,
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(
+                                      color: !_iAmPayer
+                                          ? FormaColors.primaryAccent
+                                          : (isDark
+                                              ? Colors.white10
+                                              : FormaColors.divider),
+                                    ),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      'They paid you',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w800,
+                                        fontSize: 13,
+                                        color: !_iAmPayer
+                                            ? FormaColors.charcoal
+                                            : primaryTextColor,
+                                      ),
+                                    ),
+                                  ),
+                                ),
                               ),
                             ),
                           ],
                         ),
-                      ),
 
-                      const SizedBox(height: 24),
-                    ],
+                        const SizedBox(height: 18),
+
+                        // 3. Member Selector
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Other Participant',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w800,
+                                color: primaryTextColor,
+                              ),
+                            ),
+                            TextButton.icon(
+                              onPressed: () => _openParticipantPicker(context),
+                              icon: const Icon(Icons.people_outline_rounded,
+                                  size: 16, color: FormaColors.primaryAccent),
+                              label: Text(
+                                _recipientUid.isEmpty
+                                    ? 'Select Person'
+                                    : 'Change',
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
+                                  color: FormaColors.primaryAccent,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        // Prominent Interactive Participant Card
+                        FormaBounceable(
+                          onTap: () => _openParticipantPicker(context),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 14),
+                            decoration: BoxDecoration(
+                              color: cardBg,
+                              borderRadius: BorderRadius.circular(18),
+                              border: Border.all(
+                                color: _recipientUid.isNotEmpty
+                                    ? FormaColors.primaryAccent
+                                    : (isDark
+                                        ? Colors.white12
+                                        : FormaColors.divider),
+                                width: _recipientUid.isNotEmpty ? 1.5 : 1,
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                if (_recipientUid.isNotEmpty) ...[
+                                  FormaAvatar(
+                                    photoUrl: _recipientPhotoUrl,
+                                    name: _recipientName,
+                                    size: 42,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          _recipientName,
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w800,
+                                            color: primaryTextColor,
+                                          ),
+                                        ),
+                                        Text(
+                                          _outstandingAmount > 0
+                                              ? (_iAmPayer
+                                                  ? 'You owe them ₹${_outstandingAmount.toStringAsFixed(0)}'
+                                                  : 'They owe you ₹${_outstandingAmount.toStringAsFixed(0)}')
+                                              : 'No outstanding debt • Tap to change',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: _outstandingAmount > 0
+                                                ? (_iAmPayer
+                                                    ? FormaColors.coralPink
+                                                    : FormaColors.success)
+                                                : secondaryTextColor,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10, vertical: 6),
+                                    decoration: BoxDecoration(
+                                      color: FormaColors.primaryAccent
+                                          .withValues(alpha: 0.15),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: const Icon(
+                                      Icons.swap_horiz_rounded,
+                                      color: FormaColors.primaryAccent,
+                                      size: 18,
+                                    ),
+                                  ),
+                                ] else ...[
+                                  Container(
+                                    width: 42,
+                                    height: 42,
+                                    decoration: BoxDecoration(
+                                      color: FormaColors.primaryAccent
+                                          .withValues(alpha: 0.15),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(
+                                      Icons.person_add_rounded,
+                                      color: FormaColors.primaryAccent,
+                                      size: 20,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Select Person to Settle With',
+                                          style: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w800,
+                                            color: primaryTextColor,
+                                          ),
+                                        ),
+                                        Text(
+                                          'Tap here to choose from friends or open balances',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: secondaryTextColor,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const Icon(
+                                    Icons.chevron_right_rounded,
+                                    color: FormaColors.primaryAccent,
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
+                        ),
+                        if (balances.isNotEmpty) ...[
+                          const SizedBox(height: 10),
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            physics: const BouncingScrollPhysics(),
+                            child: Row(
+                              children: [
+                                ...balances.map((bal) {
+                                  final isSel =
+                                      _recipientUid == bal.participantUid;
+                                  return Padding(
+                                    padding: const EdgeInsets.only(right: 8),
+                                    child: FormaBounceable(
+                                      onTap: () {
+                                        setState(() {
+                                          _recipientUid = bal.participantUid;
+                                          _recipientName = bal.displayName;
+                                          _recipientPhotoUrl = bal.photoUrl;
+                                          _outstandingAmount =
+                                              bal.netBalance.abs();
+                                          _iAmPayer = bal.youOwe;
+                                          _amountNotifier
+                                              .value = _outstandingAmount >
+                                                  0
+                                              ? _outstandingAmount.toStringAsFixed(
+                                                  _outstandingAmount
+                                                              .truncateToDouble() ==
+                                                          _outstandingAmount
+                                                      ? 0
+                                                      : 2)
+                                              : '';
+                                          _errorMessage = null;
+                                        });
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 12, vertical: 8),
+                                        decoration: BoxDecoration(
+                                          color: isSel
+                                              ? FormaColors.primaryAccent
+                                                  .withValues(alpha: 0.25)
+                                              : cardBg,
+                                          borderRadius:
+                                              BorderRadius.circular(14),
+                                          border: Border.all(
+                                            color: isSel
+                                                ? FormaColors.primaryAccent
+                                                : (isDark
+                                                    ? Colors.white10
+                                                    : FormaColors.divider),
+                                            width: isSel ? 2 : 1,
+                                          ),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            FormaAvatar(
+                                              photoUrl: bal.photoUrl,
+                                              name: bal.displayName,
+                                              size: 22,
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Text(
+                                              bal.displayName,
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: isSel
+                                                    ? FontWeight.w800
+                                                    : FontWeight.w600,
+                                                color: primaryTextColor,
+                                              ),
+                                            ),
+                                            if (bal.netBalance.abs() > 0) ...[
+                                              const SizedBox(width: 4),
+                                              Text(
+                                                '₹${bal.netBalance.abs().toStringAsFixed(0)}',
+                                                style: TextStyle(
+                                                  fontSize: 11,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: bal.youAreOwed
+                                                      ? FormaColors.success
+                                                      : FormaColors.coralPink,
+                                                ),
+                                              ),
+                                            ],
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }),
+                              ],
+                            ),
+                          ),
+                        ],
+
+                        const SizedBox(height: 18),
+
+                        // 4. Note
+                        Text(
+                          'Payment Method or Note',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w800,
+                            color: primaryTextColor,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: _noteController,
+                          style:
+                              TextStyle(fontSize: 14, color: primaryTextColor),
+                          decoration: InputDecoration(
+                            hintText: 'e.g. Paid via UPI / Cash / Google Pay',
+                            hintStyle: TextStyle(
+                                color:
+                                    secondaryTextColor.withValues(alpha: 0.6)),
+                            filled: true,
+                            fillColor: cardBg,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(18),
+                              borderSide: BorderSide(
+                                  color: isDark
+                                      ? Colors.white10
+                                      : FormaColors.divider),
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 16),
+                        // Clarification note
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: FormaColors.icyBlue.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.info_outline_rounded,
+                                  size: 18, color: FormaColors.icyBlue),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'FORMA records offline and peer payments. No bank credentials or financial transactions are handled.',
+                                  style: TextStyle(
+                                      fontSize: 11,
+                                      color: isDark
+                                          ? Colors.white70
+                                          : FormaColors.charcoal),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        const SizedBox(height: 24),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              if (_useCustomKeypad)
-                CustomNumericKeypad(
-                  amountNotifier: _amountNotifier,
-                  isDark: isDark,
-                  showDoneButton: false,
-                  onSwitchToSystemKeyboard: () {
-                    setState(() => _useCustomKeypad = false);
-                  },
-                )
-              else
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  child: TextButton.icon(
-                    icon: const Icon(Icons.dialpad_rounded),
-                    label: const Text('Switch back to tactile numeric keypad'),
-                    onPressed: () => setState(() => _useCustomKeypad = true),
+                if (_useCustomKeypad)
+                  CustomNumericKeypad(
+                    amountNotifier: _amountNotifier,
+                    isDark: isDark,
+                    showDoneButton: false,
+                    onSwitchToSystemKeyboard: () {
+                      setState(() => _useCustomKeypad = false);
+                    },
+                  )
+                else
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 10),
+                    child: TextButton.icon(
+                      icon: const Icon(Icons.dialpad_rounded),
+                      label:
+                          const Text('Switch back to tactile numeric keypad'),
+                      onPressed: () => setState(() => _useCustomKeypad = true),
+                    ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 }

@@ -196,91 +196,92 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
               style: TextStyle(fontWeight: FontWeight.w800)),
           centerTitle: false,
         ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Top Bento Segment Switcher
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Container(
-                padding: const EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  color:
-                      isDark ? FormaColors.charcoal : const Color(0xFFF0ECE4),
-                  borderRadius: BorderRadius.circular(16),
+        body: SafeArea(
+          child: Column(
+            children: [
+              // Top Bento Segment Switcher
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color:
+                        isDark ? FormaColors.charcoal : const Color(0xFFF0ECE4),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: _buildSegmentButton(
+                          index: 0,
+                          label: 'Friends',
+                          badgeCount: incomingCount,
+                          isDark: isDark,
+                        ),
+                      ),
+                      Expanded(
+                        child: _buildSegmentButton(
+                          index: 1,
+                          label: 'Find',
+                          badgeCount: 0,
+                          isDark: isDark,
+                        ),
+                      ),
+                      Expanded(
+                        child: _buildSegmentButton(
+                          index: 2,
+                          label: 'Groups',
+                          badgeCount: 0,
+                          isDark: isDark,
+                        ),
+                      ),
+                      Expanded(
+                        child: _buildSegmentButton(
+                          index: 3,
+                          label: 'Activity',
+                          badgeCount: 0,
+                          isDark: isDark,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                child: Row(
+              ),
+
+              Expanded(
+                child: IndexedStack(
+                  index: _selectedTab,
                   children: [
-                    Expanded(
-                      child: _buildSegmentButton(
-                        index: 0,
-                        label: 'Friends',
-                        badgeCount: incomingCount,
-                        isDark: isDark,
-                      ),
+                    // Tab 0: Friends & Requests (Sections 1 & 2 & 4)
+                    _buildFriendsTab(
+                      incomingRequestsAsync: incomingRequestsAsync,
+                      outgoingRequestsAsync: outgoingRequestsAsync,
+                      confirmedFriendsAsync: confirmedFriendsAsync,
+                      myCodeAsync: myCodeAsync,
+                      isDark: isDark,
                     ),
-                    Expanded(
-                      child: _buildSegmentButton(
-                        index: 1,
-                        label: 'Find',
-                        badgeCount: 0,
-                        isDark: isDark,
-                      ),
-                    ),
-                    Expanded(
-                      child: _buildSegmentButton(
-                        index: 2,
-                        label: 'Groups',
-                        badgeCount: 0,
-                        isDark: isDark,
-                      ),
-                    ),
-                    Expanded(
-                      child: _buildSegmentButton(
-                        index: 3,
-                        label: 'Activity',
-                        badgeCount: 0,
-                        isDark: isDark,
-                      ),
-                    ),
+
+                    // Tab 1: Find Friends (Section 3)
+                    _buildFindFriendsTab(isDark: isDark),
+
+                    // Tab 2: Groups (Section 5)
+                    _buildGroupsTab(groupsAsync: groupsAsync, isDark: isDark),
+
+                    // Tab 3: Activity (Section 6)
+                    _buildActivityTab(
+                        activitiesAsync: activitiesAsync, isDark: isDark),
                   ],
                 ),
               ),
-            ),
-
-            Expanded(
-              child: IndexedStack(
-                index: _selectedTab,
-                children: [
-                  // Tab 0: Friends & Requests (Sections 1 & 2 & 4)
-                  _buildFriendsTab(
-                    incomingRequestsAsync: incomingRequestsAsync,
-                    outgoingRequestsAsync: outgoingRequestsAsync,
-                    confirmedFriendsAsync: confirmedFriendsAsync,
-                    myCodeAsync: myCodeAsync,
-                    isDark: isDark,
-                  ),
-
-                  // Tab 1: Find Friends (Section 3)
-                  _buildFindFriendsTab(isDark: isDark),
-
-                  // Tab 2: Groups (Section 5)
-                  _buildGroupsTab(groupsAsync: groupsAsync, isDark: isDark),
-
-                  // Tab 3: Activity (Section 6)
-                  _buildActivityTab(
-                      activitiesAsync: activitiesAsync, isDark: isDark),
-                ],
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
-Widget _buildSegmentButton({
+  Widget _buildSegmentButton({
     required int index,
     required String label,
     required int badgeCount,

@@ -20,7 +20,8 @@ class ApkDownloadService {
   /// Downloads an APK from the official release asset and reports live progress.
   Stream<DownloadProgress> downloadApk(AppReleaseInfo release) async* {
     _isCancelled = false;
-    yield DownloadProgress.downloading(received: 0, total: release.apkSizeBytes, speed: 0);
+    yield DownloadProgress.downloading(
+        received: 0, total: release.apkSizeBytes, speed: 0);
 
     final request = http.Request('GET', Uri.parse(release.apkDownloadUrl));
     request.headers['User-Agent'] = 'FORMA-Android-App/1.0';
@@ -34,7 +35,8 @@ class ApkDownloadService {
     }
 
     if (response.statusCode != 200) {
-      yield DownloadProgress.failed('Download failed with HTTP status ${response.statusCode}');
+      yield DownloadProgress.failed(
+          'Download failed with HTTP status ${response.statusCode}');
       return;
     }
 
@@ -116,8 +118,10 @@ class ApkDownloadService {
 
         // Validate File Size
         final actualSize = await targetFile.length();
-        if (actualSize == 0 || (totalBytes > 0 && (actualSize - totalBytes).abs() > 1024 * 1024)) {
-          controller.add(DownloadProgress.failed('Downloaded file size mismatch. Download may be corrupt.'));
+        if (actualSize == 0 ||
+            (totalBytes > 0 && (actualSize - totalBytes).abs() > 1024 * 1024)) {
+          controller.add(DownloadProgress.failed(
+              'Downloaded file size mismatch. Download may be corrupt.'));
           try {
             await targetFile.delete();
           } catch (_) {}
@@ -126,10 +130,12 @@ class ApkDownloadService {
         }
 
         // Validate SHA-256 Checksum if present
-        if (release.sha256Checksum != null && release.sha256Checksum!.isNotEmpty) {
+        if (release.sha256Checksum != null &&
+            release.sha256Checksum!.isNotEmpty) {
           controller.add(DownloadProgress.verifying(total: actualSize));
           final fileBytes = await targetFile.readAsBytes();
-          final computedDigest = sha256.convert(fileBytes).toString().toLowerCase();
+          final computedDigest =
+              sha256.convert(fileBytes).toString().toLowerCase();
 
           if (computedDigest != release.sha256Checksum!.toLowerCase()) {
             controller.add(DownloadProgress.failed(

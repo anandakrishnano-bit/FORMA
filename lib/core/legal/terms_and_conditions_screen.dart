@@ -20,10 +20,14 @@ class TermsAndConditionsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final backgroundColor = isDark ? FormaColors.darkBackground : FormaColors.lightBackground;
-    final cardColor = isDark ? FormaColors.darkCardBackground : FormaColors.lightCardBackground;
+    final backgroundColor =
+        isDark ? FormaColors.darkBackground : FormaColors.lightBackground;
+    final cardColor = isDark
+        ? FormaColors.darkCardBackground
+        : FormaColors.lightCardBackground;
     final primaryTextColor = isDark ? Colors.white : FormaColors.charcoal;
-    final secondaryTextColor = isDark ? FormaColors.darkSecondaryText : FormaColors.lightSecondaryText;
+    final secondaryTextColor =
+        isDark ? FormaColors.darkSecondaryText : FormaColors.lightSecondaryText;
 
     return PopScope(
       canPop: true,
@@ -50,7 +54,9 @@ class TermsAndConditionsScreen extends StatelessWidget {
               margin: const EdgeInsets.only(right: 16),
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
-                color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
+                color: isDark
+                    ? Colors.white10
+                    : Colors.black.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Center(
@@ -77,12 +83,15 @@ class TermsAndConditionsScreen extends StatelessWidget {
                 color: cardColor,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: isDark ? Colors.white10 : FormaColors.divider.withValues(alpha: 0.5),
+                  color: isDark
+                      ? Colors.white10
+                      : FormaColors.divider.withValues(alpha: 0.5),
                 ),
               ),
               child: Row(
                 children: [
-                  Icon(Icons.gavel_rounded, size: 20, color: FormaColors.primaryAccent),
+                  Icon(Icons.gavel_rounded,
+                      size: 20, color: FormaColors.primaryAccent),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
@@ -138,7 +147,9 @@ class TermsAndConditionsScreen extends StatelessWidget {
                   p: GoogleFonts.plusJakartaSans(
                     fontSize: 13.5,
                     height: 1.6,
-                    color: isDark ? Colors.white.withValues(alpha: 0.88) : const Color(0xFF2C2C2E),
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.88)
+                        : const Color(0xFF2C2C2E),
                   ),
                   listBullet: GoogleFonts.plusJakartaSans(
                     fontSize: 14,
@@ -153,10 +164,13 @@ class TermsAndConditionsScreen extends StatelessWidget {
                     ),
                   ),
                   blockquoteDecoration: BoxDecoration(
-                    color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.04),
+                    color: isDark
+                        ? Colors.white10
+                        : Colors.black.withValues(alpha: 0.04),
                     borderRadius: BorderRadius.circular(8),
                     border: const Border(
-                      left: BorderSide(color: FormaColors.primaryAccent, width: 4),
+                      left: BorderSide(
+                          color: FormaColors.primaryAccent, width: 4),
                     ),
                   ),
                 ),

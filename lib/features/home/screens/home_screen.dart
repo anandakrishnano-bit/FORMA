@@ -210,9 +210,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                       onPressed: () async {
                         try {
-                          await ref
-                              .read(authRepositoryProvider)
-                              .acceptTerms(
+                          await ref.read(authRepositoryProvider).acceptTerms(
                                 uid: uid,
                                 version: FormaTermsData.currentVersion,
                               );

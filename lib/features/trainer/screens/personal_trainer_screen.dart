@@ -85,173 +85,176 @@ class _PersonalTrainerScreenState extends ConsumerState<PersonalTrainerScreen> {
             'Personal Trainer',
             style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18),
           ),
-        centerTitle: false,
-        actions: [
-          IconButton(
-            tooltip: 'Trainer Settings',
-            icon: const Icon(Icons.tune_rounded, size: 20),
-            onPressed: () => context.push('/user-api-key-settings'),
-          ),
-          IconButton(
-            tooltip: 'New Conversation',
-            icon: const Icon(Icons.refresh_rounded, size: 20),
-            onPressed: () {
-              ref.read(personalTrainerProvider.notifier).startNewConversation();
-            },
-          ),
-        ],
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            // 1. Messages View Area
-            Expanded(
-              child: ListView.builder(
-                controller: _scrollController,
-                physics: const BouncingScrollPhysics(),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                itemCount: trainerState.messages.length +
-                    (trainerState.isLoading ? 1 : 0),
-                itemBuilder: (context, index) {
-                  if (index == trainerState.messages.length &&
-                      trainerState.isLoading) {
-                    return _buildLoadingBubble(isDark);
-                  }
-
-                  final msg = trainerState.messages[index];
-                  final isUser = msg.sender == MessageSender.user;
-
-                  return _buildMessageBubble(msg, isUser, isDark);
-                },
-              ),
+          centerTitle: false,
+          actions: [
+            IconButton(
+              tooltip: 'Trainer Settings',
+              icon: const Icon(Icons.tune_rounded, size: 20),
+              onPressed: () => context.push('/user-api-key-settings'),
             ),
-
-            // 2. Quick Suggested Questions Carousel (shown when conversation is new)
-            if (trainerState.messages.length <= 1 && !trainerState.isLoading)
-              Container(
-                height: 44,
-                margin: const EdgeInsets.only(bottom: 8),
+            IconButton(
+              tooltip: 'New Conversation',
+              icon: const Icon(Icons.refresh_rounded, size: 20),
+              onPressed: () {
+                ref
+                    .read(personalTrainerProvider.notifier)
+                    .startNewConversation();
+              },
+            ),
+          ],
+        ),
+        body: SafeArea(
+          child: Column(
+            children: [
+              // 1. Messages View Area
+              Expanded(
                 child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
+                  controller: _scrollController,
                   physics: const BouncingScrollPhysics(),
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: _quickSuggestions.length,
-                  itemBuilder: (context, idx) {
-                    final suggestion = _quickSuggestions[idx];
-                    return GestureDetector(
-                      onTap: () {
-                        _inputController.text = suggestion;
-                        _sendMessage();
-                      },
-                      child: Container(
-                        margin: const EdgeInsets.only(right: 8),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 10),
-                        decoration: BoxDecoration(
-                          color: isDark
-                              ? FormaColors.darkCardBackground
-                              : FormaColors.lightCardBackground,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: FormaColors.primaryAccent
-                                .withValues(alpha: 0.3),
-                          ),
-                        ),
-                        child: Text(
-                          suggestion,
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: isDark
-                                ? FormaColors.darkPrimaryText
-                                : FormaColors.lightPrimaryText,
-                          ),
-                        ),
-                      ),
-                    );
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  itemCount: trainerState.messages.length +
+                      (trainerState.isLoading ? 1 : 0),
+                  itemBuilder: (context, index) {
+                    if (index == trainerState.messages.length &&
+                        trainerState.isLoading) {
+                      return _buildLoadingBubble(isDark);
+                    }
+
+                    final msg = trainerState.messages[index];
+                    final isUser = msg.sender == MessageSender.user;
+
+                    return _buildMessageBubble(msg, isUser, isDark);
                   },
                 ),
               ),
 
-            // 3. Bottom Text Input Field (Fixed with adjustResize keyboard support)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
-                color: isDark ? FormaColors.darkCardBackground : Colors.white,
-                border: Border(
-                  top: BorderSide(
-                    color: isDark
-                        ? Colors.white10
-                        : Colors.black.withValues(alpha: 0.05),
+              // 2. Quick Suggested Questions Carousel (shown when conversation is new)
+              if (trainerState.messages.length <= 1 && !trainerState.isLoading)
+                Container(
+                  height: 44,
+                  margin: const EdgeInsets.only(bottom: 8),
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    physics: const BouncingScrollPhysics(),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: _quickSuggestions.length,
+                    itemBuilder: (context, idx) {
+                      final suggestion = _quickSuggestions[idx];
+                      return GestureDetector(
+                        onTap: () {
+                          _inputController.text = suggestion;
+                          _sendMessage();
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.only(right: 8),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 10),
+                          decoration: BoxDecoration(
+                            color: isDark
+                                ? FormaColors.darkCardBackground
+                                : FormaColors.lightCardBackground,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: FormaColors.primaryAccent
+                                  .withValues(alpha: 0.3),
+                            ),
+                          ),
+                          child: Text(
+                            suggestion,
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: isDark
+                                  ? FormaColors.darkPrimaryText
+                                  : FormaColors.lightPrimaryText,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      decoration: BoxDecoration(
-                        color: isDark
-                            ? FormaColors.darkSecondaryBackground
-                            : FormaColors.lightSecondaryBackground,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: TextField(
-                        controller: _inputController,
-                        textCapitalization: TextCapitalization.sentences,
-                        minLines: 1,
-                        maxLines: 4,
-                        style: TextStyle(
-                          fontSize: 14,
+
+              // 3. Bottom Text Input Field (Fixed with adjustResize keyboard support)
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: isDark ? FormaColors.darkCardBackground : Colors.white,
+                  border: Border(
+                    top: BorderSide(
+                      color: isDark
+                          ? Colors.white10
+                          : Colors.black.withValues(alpha: 0.05),
+                    ),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        decoration: BoxDecoration(
                           color: isDark
-                              ? FormaColors.darkPrimaryText
-                              : FormaColors.lightPrimaryText,
+                              ? FormaColors.darkSecondaryBackground
+                              : FormaColors.lightSecondaryBackground,
+                          borderRadius: BorderRadius.circular(20),
                         ),
-                        decoration: InputDecoration(
-                          hintText: 'Ask about exercises, routines, food...',
-                          hintStyle: TextStyle(
-                            fontSize: 13,
+                        child: TextField(
+                          controller: _inputController,
+                          textCapitalization: TextCapitalization.sentences,
+                          minLines: 1,
+                          maxLines: 4,
+                          style: TextStyle(
+                            fontSize: 14,
                             color: isDark
-                                ? FormaColors.darkSecondaryText
-                                : FormaColors.lightSecondaryText,
+                                ? FormaColors.darkPrimaryText
+                                : FormaColors.lightPrimaryText,
                           ),
-                          border: InputBorder.none,
-                          contentPadding:
-                              const EdgeInsets.symmetric(vertical: 12),
+                          decoration: InputDecoration(
+                            hintText: 'Ask about exercises, routines, food...',
+                            hintStyle: TextStyle(
+                              fontSize: 13,
+                              color: isDark
+                                  ? FormaColors.darkSecondaryText
+                                  : FormaColors.lightSecondaryText,
+                            ),
+                            border: InputBorder.none,
+                            contentPadding:
+                                const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                          onSubmitted: (_) => _sendMessage(),
                         ),
-                        onSubmitted: (_) => _sendMessage(),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 10),
-                  GestureDetector(
-                    onTap: _sendMessage,
-                    child: Container(
-                      width: 44,
-                      height: 44,
-                      decoration: const BoxDecoration(
-                        color: FormaColors.primaryAccent,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Center(
-                        child: Icon(Icons.send_rounded,
-                            size: 20, color: FormaColors.charcoal),
+                    const SizedBox(width: 10),
+                    GestureDetector(
+                      onTap: _sendMessage,
+                      child: Container(
+                        width: 44,
+                        height: 44,
+                        decoration: const BoxDecoration(
+                          color: FormaColors.primaryAccent,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Center(
+                          child: Icon(Icons.send_rounded,
+                              size: 20, color: FormaColors.charcoal),
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
-Widget _buildMessageBubble(TrainerMessage msg, bool isUser, bool isDark) {
+  Widget _buildMessageBubble(TrainerMessage msg, bool isUser, bool isDark) {
     return Align(
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
