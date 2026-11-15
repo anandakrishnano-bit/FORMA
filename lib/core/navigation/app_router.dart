@@ -89,9 +89,55 @@ Page<dynamic> _buildPageWithTransition({
   LocalKey? key,
   required Widget child,
 }) {
-  return MaterialPage(
-    key: UniqueKey(),
+  return CustomTransitionPage<dynamic>(
+    key: key,
     child: child,
+    transitionDuration: const Duration(milliseconds: 300),
+    reverseTransitionDuration: const Duration(milliseconds: 260),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      final curved = CurvedAnimation(
+        parent: animation,
+        curve: Curves.easeOutCubic,
+        reverseCurve: Curves.easeInCubic,
+      );
+
+      final secondaryCurved = CurvedAnimation(
+        parent: secondaryAnimation,
+        curve: Curves.easeOutCubic,
+        reverseCurve: Curves.easeInCubic,
+      );
+
+      // Incoming screen slides in smoothly from right to left
+      final slideIn = Tween<Offset>(
+        begin: const Offset(1.0, 0.0),
+        end: Offset.zero,
+      ).animate(curved);
+
+      // Outgoing screen moves back slightly with a 20% parallax shift
+      final slideOut = Tween<Offset>(
+        begin: Offset.zero,
+        end: const Offset(-0.20, 0.0),
+      ).animate(secondaryCurved);
+
+      return SlideTransition(
+        position: slideOut,
+        child: SlideTransition(
+          position: slideIn,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.16),
+                  blurRadius: 20,
+                  offset: const Offset(-4, 0),
+                ),
+              ],
+            ),
+            child: child,
+          ),
+        ),
+      );
+    },
   );
 }
 
