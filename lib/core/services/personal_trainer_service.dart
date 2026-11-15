@@ -30,8 +30,8 @@ class PersonalTrainerBackendService {
     if (userKey == null || userKey.trim().isEmpty) {
       AppLogger.warn(
           'TRAINER', 'No personal Gemini API key found in SecureStorage');
-      return "No Gemini API key configured.\n\n"
-          "To chat with your AI Personal Trainer powered by Google Gemini, please configure your personal Gemini API key in Profile > Trainer Access Key (or open System Diagnostics to verify your setup).";
+      return "AI Assistant not connected.\n\n"
+          "To chat with your AI Personal Trainer, please connect your AI Assistant in Profile > AI Assistant Settings.";
     }
 
     final maskedKey = userKey.length > 8

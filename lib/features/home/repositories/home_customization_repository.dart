@@ -120,6 +120,49 @@ class HomeCustomizationNotifier extends StateNotifier<List<HomeCardConfig>> {
     await _persist(updated);
   }
 
+  Future<void> applyFocusAreas(List<String> focusAreas) async {
+    if (focusAreas.isEmpty) return;
+
+    final preferredCardIds = <String>[];
+    if (focusAreas.contains('Workouts')) {
+      preferredCardIds.addAll(['today_focus', 'muscle_split']);
+    }
+    if (focusAreas.contains('Habits')) {
+      preferredCardIds.addAll(['daily_habits', 'energy_score']);
+    }
+    if (focusAreas.contains('Nutrition')) {
+      preferredCardIds.add('daily_pillars');
+    }
+    if (focusAreas.contains('Expenses')) {
+      preferredCardIds.add('quick_tools');
+    }
+
+    final currentCards = List<HomeCardConfig>.from(state);
+    final prioritized = <HomeCardConfig>[];
+    final remaining = <HomeCardConfig>[];
+
+    for (var card in currentCards) {
+      if (preferredCardIds.contains(card.id)) {
+        prioritized.add(card.copyWith(isVisible: true));
+      } else {
+        remaining.add(card);
+      }
+    }
+
+    prioritized.sort((a, b) => preferredCardIds
+        .indexOf(a.id)
+        .compareTo(preferredCardIds.indexOf(b.id)));
+
+    final combined = [...prioritized, ...remaining];
+    final updated = <HomeCardConfig>[];
+    for (int i = 0; i < combined.length; i++) {
+      updated.add(combined[i].copyWith(order: i));
+    }
+
+    state = updated;
+    await _persist(updated);
+  }
+
   Future<void> resetToDefault() async {
     state = HomeCardConfig.defaults;
     await _persist(HomeCardConfig.defaults);

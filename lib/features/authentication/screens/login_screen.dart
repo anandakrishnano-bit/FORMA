@@ -999,8 +999,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
           ),
-          if (_isLoading)
-            const FormaLoadingOverlay(title: 'Authenticating with FORMA...'),
+          if (_isLoading) const FormaLoadingOverlay(title: 'Signing you in...'),
         ],
       ),
     );

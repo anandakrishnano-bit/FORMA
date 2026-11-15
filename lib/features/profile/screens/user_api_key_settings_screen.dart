@@ -46,7 +46,7 @@ class _UserApiKeySettingsScreenState extends State<UserApiKeySettingsScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
               content: Text(
-                  'Key removed. Personal Trainer will use standard guidance.')),
+                  'Assistant disconnected. Standard coaching guidance will be used.')),
         );
       }
       return;
@@ -56,8 +56,7 @@ class _UserApiKeySettingsScreenState extends State<UserApiKeySettingsScreen> {
     if (mounted) {
       setState(() => _isSaved = true);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Key saved securely in Android Keystore!')),
+        const SnackBar(content: Text('AI Assistant connected securely!')),
       );
     }
   }
@@ -76,7 +75,7 @@ class _UserApiKeySettingsScreenState extends State<UserApiKeySettingsScreen> {
       backgroundColor:
           isDark ? FormaColors.darkBackground : FormaColors.lightBackground,
       appBar: AppBar(
-        title: const Text('Personal Trainer Connection',
+        title: const Text('AI Assistant Connection',
             style: TextStyle(fontWeight: FontWeight.w800)),
         centerTitle: false,
       ),
@@ -110,8 +109,10 @@ class _UserApiKeySettingsScreenState extends State<UserApiKeySettingsScreen> {
                                     .withValues(alpha: 0.2),
                                 shape: BoxShape.circle,
                               ),
-                              child: const Icon(Icons.fitness_center_rounded,
-                                  color: FormaColors.goldenYellow, size: 22),
+                              child: const Icon(
+                                  Icons.chat_bubble_outline_rounded,
+                                  color: FormaColors.goldenYellow,
+                                  size: 22),
                             ),
                             const SizedBox(width: 12),
                             Expanded(
@@ -119,7 +120,7 @@ class _UserApiKeySettingsScreenState extends State<UserApiKeySettingsScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Personal Trainer Connection',
+                                    'AI Assistant',
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w800,
@@ -145,7 +146,7 @@ class _UserApiKeySettingsScreenState extends State<UserApiKeySettingsScreen> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'Your key powers your private Personal Trainer and daily reviews. It is hardware-encrypted on your phone and never shared with other users or friends.',
+                          'Your assistant helps you review workouts, nutrition, and daily routines. Your connection code is encrypted on your device and remains completely private.',
                           style: TextStyle(
                             fontSize: 13,
                             height: 1.4,
@@ -159,7 +160,7 @@ class _UserApiKeySettingsScreenState extends State<UserApiKeySettingsScreen> {
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    'API KEY',
+                    'CONNECTION CODE',
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w800,
@@ -172,14 +173,13 @@ class _UserApiKeySettingsScreenState extends State<UserApiKeySettingsScreen> {
                   const SizedBox(height: 10),
                   FormaTextField(
                     controller: _keyController,
-                    hint: 'Paste your key (starts with AIzaSy...)',
+                    hint: 'Paste your connection code (starts with AIzaSy...)',
                     obscureText: true,
                     prefixIcon: Icons.key_rounded,
                   ),
                   const SizedBox(height: 20),
                   FormaButton(
-                    label:
-                        _isSaved ? 'Update Saved Key' : 'Save Key to Keystore',
+                    label: _isSaved ? 'Update Connection' : 'Save Connection',
                     onPressed: _saveKey,
                   ),
                   const SizedBox(height: 16),
@@ -197,7 +197,7 @@ class _UserApiKeySettingsScreenState extends State<UserApiKeySettingsScreen> {
                             borderRadius: BorderRadius.circular(16)),
                       ),
                       child: const Center(
-                        child: Text('Remove Key',
+                        child: Text('Disconnect Assistant',
                             style: TextStyle(fontWeight: FontWeight.w700)),
                       ),
                     ),
@@ -214,13 +214,13 @@ class _UserApiKeySettingsScreenState extends State<UserApiKeySettingsScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          'Where do I get a free key?',
+                          'How to get a connection code',
                           style: TextStyle(
                               fontSize: 14, fontWeight: FontWeight.w800),
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          '1. Visit aistudio.google.com\n2. Sign in with your Google account\n3. Tap "Get API key" and copy it here.',
+                          '1. Visit aistudio.google.com\n2. Sign in with your Google account\n3. Tap "Get API key" and copy your personal code here.',
                           style: TextStyle(
                             fontSize: 12,
                             height: 1.5,
