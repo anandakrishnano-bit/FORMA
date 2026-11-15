@@ -31,6 +31,14 @@ service firebase.storage {
       allow read: if isAuthenticated();
       allow write: if false; // Curated and deployed by admin
     }
+
+    // Bug report screenshots
+    match /bug-reports/{userId}/{reportId}/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isOwner(userId)
+        && request.resource.size < 4 * 1024 * 1024
+        && request.resource.contentType.matches('image/(jpeg|png|webp)');
+    }
   }
 }
 

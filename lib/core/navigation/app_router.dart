@@ -48,6 +48,13 @@ import 'package:forma/features/home/screens/customize_home_screen.dart';
 import 'package:forma/features/search/screens/global_search_screen.dart';
 import 'package:forma/features/expenses/screens/spending_insights_screen.dart';
 import 'package:forma/features/reports/screens/weekly_report_screen.dart';
+import 'package:forma/core/bug_report/models/bug_report_model.dart';
+import 'package:forma/core/bug_report/services/screen_capture_service.dart';
+import 'package:forma/features/profile/screens/help_and_support_screen.dart';
+import 'package:forma/features/profile/screens/report_problem_screen.dart';
+import 'package:forma/features/profile/screens/my_bug_reports_screen.dart';
+import 'package:forma/features/profile/screens/maintainer_bug_reports_screen.dart';
+import 'package:forma/features/profile/screens/maintainer_bug_report_detail_screen.dart';
 
 // ─── Route path constants ───────────────────────────────────────
 class AppRoutes {
@@ -75,6 +82,10 @@ class AppRoutes {
   static const String search = '/search';
   static const String spendingInsights = '/expenses/insights';
   static const String weeklyReport = '/weekly-report';
+  static const String help = '/profile/help';
+  static const String reportProblem = '/profile/help/report-problem';
+  static const String myBugReports = '/profile/help/my-reports';
+  static const String maintainerBugReports = '/profile/help/maintainer-reports';
 }
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -141,9 +152,32 @@ Page<dynamic> _buildPageWithTransition({
   );
 }
 
+class _FormaRouteObserver extends NavigatorObserver {
+  @override
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    super.didPush(route, previousRoute);
+    final name = route.settings.name;
+    if (name != null) {
+      ScreenCaptureService.instance.updateLastVisitedRoute(name);
+    }
+  }
+
+  @override
+  void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
+    super.didReplace(newRoute: newRoute, oldRoute: oldRoute);
+    final name = newRoute?.settings.name;
+    if (name != null) {
+      ScreenCaptureService.instance.updateLastVisitedRoute(name);
+    }
+  }
+}
+
 final GoRouter appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
   initialLocation: AppRoutes.splash,
+  observers: [
+    _FormaRouteObserver(),
+  ],
   routes: [
     GoRoute(
       path: AppRoutes.splash,
@@ -533,6 +567,50 @@ final GoRouter appRouter = GoRouter(
       path: '/terms-and-conditions',
       pageBuilder: (context, state) => _buildPageWithTransition(
         child: const TermsAndConditionsScreen(),
+      ),
+    ),
+
+    // ── In-App Bug Reporting & Help Center Routes ──
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: AppRoutes.help,
+      pageBuilder: (context, state) => _buildPageWithTransition(
+        key: state.pageKey,
+        child: const HelpAndSupportScreen(),
+      ),
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: AppRoutes.reportProblem,
+      pageBuilder: (context, state) => _buildPageWithTransition(
+        key: state.pageKey,
+        child: const ReportProblemScreen(),
+      ),
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: AppRoutes.myBugReports,
+      pageBuilder: (context, state) => _buildPageWithTransition(
+        key: state.pageKey,
+        child: const MyBugReportsScreen(),
+      ),
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: AppRoutes.maintainerBugReports,
+      pageBuilder: (context, state) => _buildPageWithTransition(
+        key: state.pageKey,
+        child: const MaintainerBugReportsScreen(),
+      ),
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: '/profile/help/maintainer-reports/detail',
+      pageBuilder: (context, state) => _buildPageWithTransition(
+        key: state.pageKey,
+        child: MaintainerBugReportDetailScreen(
+          report: state.extra as BugReportModel,
+        ),
       ),
     ),
 

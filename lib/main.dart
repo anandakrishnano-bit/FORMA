@@ -4,6 +4,7 @@ import 'package:forma/core/navigation/app_router.dart';
 import 'package:forma/core/theme/app_theme.dart';
 import 'package:forma/core/theme/theme_provider.dart';
 import 'package:forma/core/services/firebase_service.dart';
+import 'package:forma/core/bug_report/services/screen_capture_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,6 +28,12 @@ class FormaApp extends ConsumerWidget {
       themeAnimationDuration: const Duration(milliseconds: 380),
       themeAnimationCurve: Curves.easeInOutCubic,
       routerConfig: appRouter,
+      builder: (context, child) {
+        return RepaintBoundary(
+          key: ScreenCaptureService.instance.rootRepaintBoundaryKey,
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
     );
   }
 }

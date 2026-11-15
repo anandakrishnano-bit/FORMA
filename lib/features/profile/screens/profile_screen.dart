@@ -590,6 +590,41 @@ class ProfileScreen extends ConsumerWidget {
 
                 const SizedBox(height: 12),
 
+                // ── CATEGORY 6: Help & Support ──
+                _buildSettingsGroup(
+                  context: context,
+                  title: 'Help & Support',
+                  icon: Icons.support_agent_rounded,
+                  isDark: isDark,
+                  children: [
+                    ListTile(
+                      leading: const Icon(Icons.bug_report_rounded,
+                          color: FormaColors.coralPink),
+                      title: const Text('Report a Problem',
+                          style: TextStyle(fontWeight: FontWeight.w700)),
+                      subtitle: const Text(
+                          'Report a bug, display glitch or crash with diagnostics',
+                          style: TextStyle(fontSize: 12)),
+                      trailing: const Icon(Icons.chevron_right_rounded),
+                      onTap: () => context.push('/profile/help/report-problem'),
+                    ),
+                    const Divider(height: 1),
+                    ListTile(
+                      leading: const Icon(Icons.help_center_rounded,
+                          color: FormaColors.primaryAccent),
+                      title: const Text('Help Center & My Reports',
+                          style: TextStyle(fontWeight: FontWeight.w700)),
+                      subtitle: const Text(
+                          'Track reported issues and system health',
+                          style: TextStyle(fontSize: 12)),
+                      trailing: const Icon(Icons.chevron_right_rounded),
+                      onTap: () => context.push('/profile/help'),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 12),
+
                 _buildSettingsGroup(
                   context: context,
                   title: 'Legal & Compliance',

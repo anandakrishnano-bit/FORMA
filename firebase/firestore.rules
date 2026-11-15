@@ -255,6 +255,34 @@ service cloud.firestore {
       allow read, update, delete: if false; // Internal admin review only
     }
 
+    // ═══════════════════════════════════════════════════════════════════════
+    // IN-APP BUG REPORTS & SYSTEM DIAGNOSTICS
+    // ═══════════════════════════════════════════════════════════════════════
+    function isMaintainer() {
+      return isAuthenticated() && (
+        request.auth.token.admin == true ||
+        request.auth.token.maintainer == true ||
+        (request.auth.token.email != null && 
+         (request.auth.token.email.matches('.*@(forma\\.app|admin\\.forma)') ||
+          request.auth.token.email == 'anandakrishnano-bit@gmail.com'))
+      );
+    }
+
+    match /bugReports/{reportId} {
+      // Users can read only their own reports; maintainers can inspect all
+      allow read: if isAuthenticated() && (
+        resource.data.userId == request.auth.uid ||
+        isMaintainer()
+      );
+      // Validated creation: UID must match authenticated caller, initial status must be 'new'
+      allow create: if isAuthenticated() &&
+        request.resource.data.userId == request.auth.uid &&
+        request.resource.data.status == 'new';
+      // Only authorized maintainers can update status or append private notes
+      allow update: if isMaintainer();
+      allow delete: if isMaintainer() || (isAuthenticated() && resource.data.userId == request.auth.uid);
+    }
+
     // Auth Rate Limits (Cloud Functions only)
     match /authRateLimits/{limitId} {
       allow read, write: if false;
