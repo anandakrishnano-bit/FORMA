@@ -32,6 +32,7 @@ node_modules/
 .pub/
 **/build/
 build/
+release_dist/
 FORMA-debug.apk
 *.apk
 *.aab
