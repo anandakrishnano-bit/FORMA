@@ -9,7 +9,7 @@ import 'package:forma/core/services/secure_storage_service.dart';
 /// 2. If the user hasn't supplied a key yet, transparently informs the user with setup instructions.
 /// 3. Never secretly swallows API failures or outputs fake canned responses that pretend to be AI.
 /// 4. Injects real factual context (recent workouts, target split, logged meals) strictly with user permission.
-/// 5. Automatically discovers and calls the active, supported Gemini model (gemini-2.0-flash, gemini-1.5-flash-latest, etc.).
+/// 5. Automatically discovers and calls the active, supported Gemini model (gemini-2.0-flash, gemini-2.5-flash, etc.).
 class PersonalTrainerBackendService {
   final String? backendUrl;
   final String? directApiKey;

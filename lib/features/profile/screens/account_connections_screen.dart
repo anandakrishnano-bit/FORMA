@@ -44,6 +44,9 @@ class _AccountConnectionsScreenState extends State<AccountConnectionsScreen> {
     setState(() => _isLoading = true);
     try {
       final googleSignIn = GoogleSignIn(scopes: ['email', 'profile']);
+      try {
+        await googleSignIn.signOut();
+      } catch (_) {}
       final googleUser = await googleSignIn.signIn();
       if (googleUser == null) {
         setState(() => _isLoading = false);

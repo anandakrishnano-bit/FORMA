@@ -37,6 +37,7 @@ import 'package:forma/features/expenses/screens/add_shared_expense_screen.dart';
 import 'package:forma/features/expenses/screens/shared_expense_detail_screen.dart';
 import 'package:forma/features/expenses/screens/settlement_details_screen.dart';
 import 'package:forma/features/expenses/screens/settle_up_screen.dart';
+import 'package:forma/core/legal/terms_and_conditions_screen.dart';
 import 'package:forma/features/body/screens/body_activity_screen.dart';
 import 'package:forma/features/body/screens/body_settings_screen.dart';
 import 'package:forma/features/workout/screens/weekly_muscle_overview_screen.dart';
@@ -85,11 +86,11 @@ final _habitsNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'habits');
 final _expensesNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'expenses');
 
 Page<dynamic> _buildPageWithTransition({
-  required LocalKey key,
+  LocalKey? key,
   required Widget child,
 }) {
   return MaterialPage(
-    key: key,
+    key: UniqueKey(),
     child: child,
   );
 }
@@ -479,6 +480,13 @@ final GoRouter appRouter = GoRouter(
       pageBuilder: (context, state) => _buildPageWithTransition(
         key: state.pageKey,
         child: const WeeklyMusclePlanScreen(),
+      ),
+    ),
+    GoRoute(
+      parentNavigatorKey: _rootNavigatorKey,
+      path: '/terms-and-conditions',
+      pageBuilder: (context, state) => _buildPageWithTransition(
+        child: const TermsAndConditionsScreen(),
       ),
     ),
 

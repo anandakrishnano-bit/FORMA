@@ -70,7 +70,7 @@ class _SharedExpensesScreenState extends ConsumerState<SharedExpensesScreen> {
             icon: const Icon(Icons.person_rounded,
                 color: FormaColors.primaryAccent),
             tooltip: 'Personal Expenses',
-            onPressed: () => context.push('/expenses'),
+            onPressed: () => context.go('/expenses'),
           ),
         ],
       ),

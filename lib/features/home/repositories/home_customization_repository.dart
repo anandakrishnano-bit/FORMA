@@ -145,7 +145,7 @@ class HomeCustomizationNotifier extends StateNotifier<List<HomeCardConfig>> {
       if (preferredCardIds.contains(card.id)) {
         prioritized.add(card.copyWith(isVisible: true));
       } else {
-        remaining.add(card);
+        remaining.add(card.copyWith(isVisible: true));
       }
     }
 

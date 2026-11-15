@@ -12,6 +12,7 @@ import 'package:forma/core/components/forma_logo.dart';
 import 'package:forma/core/components/forma_button.dart';
 import 'package:forma/core/components/forma_text_field.dart';
 import 'package:forma/core/components/forma_loading_overlay.dart';
+import 'package:forma/core/legal/terms_data.dart';
 import 'package:forma/features/authentication/widgets/country_code_picker.dart';
 
 /// Complete, production-ready Firebase Authentication screen.
@@ -41,6 +42,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isRegisterMode = false;
   bool _isLoading = false;
   bool _obscurePassword = true;
+  bool _termsAccepted = false;
   String? _errorMessage;
 
   // Phone OTP State
@@ -104,6 +106,8 @@ class _LoginScreenState extends State<LoginScreen> {
           'updatedAt': FieldValue.serverTimestamp(),
           'onboardingComplete': isExistingUser,
           'onboardingCompleted': isExistingUser,
+          'termsAcceptedVersion': FormaTermsData.currentVersion,
+          'termsAcceptedAt': FieldValue.serverTimestamp(),
           'preferredAuthProviders':
               user.providerData.map((p) => p.providerId).toList(),
           'accountStatus': 'active',
@@ -160,6 +164,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       final googleSignIn = GoogleSignIn(scopes: ['email', 'profile']);
+      // Always clear any cached session so the user can choose which Google account to use
+      try {
+        await googleSignIn.signOut();
+      } catch (_) {}
       final googleUser = await googleSignIn.signIn();
 
       if (googleUser == null) {
@@ -194,9 +202,19 @@ class _LoginScreenState extends State<LoginScreen> {
         });
       }
     } catch (e) {
+      final errStr = e.toString();
+      String message = 'An error occurred during Google sign-in: $e';
+      if (errStr.contains('ApiException: 10') ||
+          errStr.contains('api_exception: 10') ||
+          errStr.contains('code: 10')) {
+        message =
+            'Google Sign-In configuration error (ApiException: 10). The release SHA-1 certificate fingerprint is not registered in Firebase Console.';
+      } else if (errStr.contains('network') || errStr.contains('SocketException')) {
+        message = 'Network error. Please check your internet connection.';
+      }
       if (mounted) {
         setState(() {
-          _errorMessage = 'An error occurred during Google sign-in: $e';
+          _errorMessage = message;
           _isLoading = false;
         });
       }
@@ -230,6 +248,11 @@ class _LoginScreenState extends State<LoginScreen> {
         setState(() => _errorMessage = 'Passwords do not match.');
         return;
       }
+      if (!_termsAccepted) {
+        setState(() => _errorMessage =
+            'Please read and agree to the Terms and Conditions to continue.');
+        return;
+      }
     }
 
     setState(() {
@@ -246,8 +269,12 @@ class _LoginScreenState extends State<LoginScreen> {
         final user = credential.user;
         if (user != null) {
           final name = _nameController.text.trim();
-          await user.updateDisplayName(name);
-          await user.sendEmailVerification();
+          await user.updateDisplayName(name).catchError((_) {});
+          try {
+            await user.sendEmailVerification();
+          } catch (err) {
+            debugPrint('Non-fatal: email verification could not be sent: $err');
+          }
           await _routeAfterAuth(user, displayNameFallback: name);
         }
       } else {
@@ -286,6 +313,10 @@ class _LoginScreenState extends State<LoginScreen> {
           break;
         case 'network-request-failed':
           message = 'Network error. Please check your internet connection.';
+          break;
+        case 'operation-not-allowed':
+          message =
+              'Email/Password sign-in is disabled in Firebase Console. Please enable Email/Password under Authentication > Sign-in method in Firebase Console.';
           break;
         default:
           message = e.message ?? 'Authentication failed. Please try again.';
@@ -887,6 +918,65 @@ class _LoginScreenState extends State<LoginScreen> {
                               controller: _confirmPasswordController,
                               prefixIcon: Icons.lock_outline_rounded,
                               obscureText: _obscurePassword,
+                            ),
+                            const SizedBox(height: 14),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: Checkbox(
+                                    value: _termsAccepted,
+                                    onChanged: (val) =>
+                                        setState(() => _termsAccepted = val ?? false),
+                                    activeColor: FormaColors.primaryAccent,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: () => setState(
+                                        () => _termsAccepted = !_termsAccepted),
+                                    child: Text.rich(
+                                      TextSpan(
+                                        text: 'I agree to the ',
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          color: isDark
+                                              ? FormaColors.darkSecondaryText
+                                              : FormaColors.lightSecondaryText,
+                                          height: 1.4,
+                                        ),
+                                        children: [
+                                          WidgetSpan(
+                                            alignment: PlaceholderAlignment.baseline,
+                                            baseline: TextBaseline.alphabetic,
+                                            child: GestureDetector(
+                                              onTap: () =>
+                                                  context.push('/terms-and-conditions'),
+                                              child: const Text(
+                                                'Terms and Conditions',
+                                                style: TextStyle(
+                                                  fontSize: 13,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: FormaColors.primaryAccent,
+                                                  decoration:
+                                                      TextDecoration.underline,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          const TextSpan(text: ' of FORMA.'),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ],

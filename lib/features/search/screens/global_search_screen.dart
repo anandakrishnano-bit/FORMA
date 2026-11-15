@@ -158,16 +158,33 @@ class _GlobalSearchScreenState extends ConsumerState<GlobalSearchScreen> {
       expenses: expenses,
     );
 
-    return Scaffold(
-      backgroundColor:
-          isDark ? FormaColors.darkBackground : FormaColors.lightBackground,
-      appBar: AppBar(
-        title: Text(
-          'Search FORMA',
-          style: GoogleFonts.plusJakartaSans(
-              fontWeight: FontWeight.w800, fontSize: 18),
+    return PopScope(
+      canPop: context.canPop(),
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) return;
+        context.go('/home');
+      },
+      child: Scaffold(
+        backgroundColor:
+            isDark ? FormaColors.darkBackground : FormaColors.lightBackground,
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_rounded),
+            tooltip: 'Back to Home',
+            onPressed: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go('/home');
+              }
+            },
+          ),
+          title: Text(
+            'Search FORMA',
+            style: GoogleFonts.plusJakartaSans(
+                fontWeight: FontWeight.w800, fontSize: 18),
+          ),
         ),
-      ),
       body: SafeArea(
         child: Column(
           children: [
@@ -289,10 +306,11 @@ class _GlobalSearchScreenState extends ConsumerState<GlobalSearchScreen> {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
-  Widget _buildRecentSearches(bool isDark) {
+Widget _buildRecentSearches(bool isDark) {
     if (_recentSearches.isEmpty) {
       return Center(
         child: Column(
@@ -562,7 +580,7 @@ class _GlobalSearchScreenState extends ConsumerState<GlobalSearchScreen> {
             categoryColor: FormaColors.goldenYellow,
             icon: Icons.restaurant_rounded,
             onTap: () {
-              context.push('/nutrition');
+              context.go('/nutrition');
             },
           ),
         );
@@ -583,7 +601,7 @@ class _GlobalSearchScreenState extends ConsumerState<GlobalSearchScreen> {
             categoryColor: const Color(0xFF6B7280),
             icon: Icons.fitness_center_rounded,
             onTap: () {
-              context.push('/workout');
+              context.go('/workout');
             },
           ),
         );
@@ -602,7 +620,7 @@ class _GlobalSearchScreenState extends ConsumerState<GlobalSearchScreen> {
             categoryColor: FormaColors.coralPink,
             icon: Icons.history_rounded,
             onTap: () {
-              context.push('/workout');
+              context.go('/workout');
             },
           ),
         );
@@ -612,20 +630,21 @@ class _GlobalSearchScreenState extends ConsumerState<GlobalSearchScreen> {
     // 4. Habits
     if (category == SearchCategory.all || category == SearchCategory.habits) {
       for (final h in habits) {
-        final title = (h as dynamic).title as String? ?? '';
-        final categoryName = (h as dynamic).category as String? ?? '';
-        if (title.toLowerCase().contains(query) ||
+        final title = h.title;
+        final categoryName = h.category;
+        if (query.isEmpty ||
+            title.toLowerCase().contains(query) ||
             categoryName.toLowerCase().contains(query)) {
           results.add(
             SearchResultItem(
-              id: 'habit_${(h as dynamic).id}',
+              id: 'habit_${h.id}',
               title: title,
               subtitle: 'Habit • $categoryName',
               categoryLabel: 'HABIT',
               categoryColor: FormaColors.secondaryAccent,
               icon: Icons.check_circle_outline_rounded,
               onTap: () {
-                context.push('/habits');
+                context.go('/habits');
               },
             ),
           );

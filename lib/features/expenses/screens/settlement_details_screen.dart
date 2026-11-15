@@ -33,18 +33,30 @@ class SettlementDetailsScreen extends ConsumerWidget {
     final isOwed = balance.youAreOwed;
     final owes = balance.youOwe;
 
-    return Scaffold(
-      backgroundColor:
-          isDark ? FormaColors.darkBackground : FormaColors.lightBackground,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios_new_rounded,
-              color: primaryTextColor, size: 20),
-          onPressed: () => context.pop(),
-        ),
-        title: Text(
+    return PopScope(
+      canPop: context.canPop(),
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) return;
+        context.go('/home');
+      },
+      child: Scaffold(
+        backgroundColor:
+            isDark ? FormaColors.darkBackground : FormaColors.lightBackground,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back_ios_new_rounded,
+                color: primaryTextColor, size: 20),
+            onPressed: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go('/home');
+              }
+            },
+          ),
+          title: Text(
           'Settlement Ledger',
           style: GoogleFonts.plusJakartaSans(
             fontSize: 18,
@@ -406,6 +418,7 @@ class SettlementDetailsScreen extends ConsumerWidget {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }

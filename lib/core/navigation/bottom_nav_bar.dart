@@ -11,7 +11,7 @@ import 'package:forma/core/theme/app_colors.dart';
 /// CRITICAL ARCHITECTURAL GUARANTEE:
 /// The navigation bar is placed inside a Stack outside and above the scrollable content.
 /// It never bounces, stretches, clips, or moves in response to page scrolling.
-class FormaShellScaffold extends StatefulWidget {
+class FormaShellScaffold extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
 
   const FormaShellScaffold({
@@ -20,106 +20,55 @@ class FormaShellScaffold extends StatefulWidget {
   });
 
   @override
-  State<FormaShellScaffold> createState() => _FormaShellScaffoldState();
-}
-
-class _FormaShellScaffoldState extends State<FormaShellScaffold>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _tabTransitionController;
-  late int _previousIndex;
-
-  @override
-  void initState() {
-    super.initState();
-    _previousIndex = widget.navigationShell.currentIndex;
-    _tabTransitionController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 260),
-    )..value = 1.0;
-  }
-
-  @override
-  void didUpdateWidget(covariant FormaShellScaffold oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.navigationShell.currentIndex !=
-        widget.navigationShell.currentIndex) {
-      _previousIndex = oldWidget.navigationShell.currentIndex;
-      _tabTransitionController.forward(from: 0.0);
-    }
-  }
-
-  @override
-  void dispose() {
-    _tabTransitionController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final isReducedMotion = MediaQuery.of(context).disableAnimations;
-
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      body: Stack(
-        children: [
-          // 1. Fluid directional cross-tab page transition (preserves full scroll/widget state)
-          Positioned.fill(
-            child: isReducedMotion
-                ? widget.navigationShell
-                : FadeTransition(
-                    opacity: Tween<double>(begin: 0.75, end: 1.0).animate(
-                      CurvedAnimation(
-                          parent: _tabTransitionController,
-                          curve: Curves.easeOutCubic),
-                    ),
-                    child: SlideTransition(
-                      position: Tween<Offset>(
-                        begin: Offset(
-                            widget.navigationShell.currentIndex > _previousIndex
-                                ? 0.03
-                                : -0.03,
-                            0.0),
-                        end: Offset.zero,
-                      ).animate(
-                        CurvedAnimation(
-                            parent: _tabTransitionController,
-                            curve: Curves.easeOutCubic),
-                      ),
-                      child: widget.navigationShell,
-                    ),
-                  ),
-          ),
-
-          // 2. Universal Quick-Add FAB
-          Positioned(
-            right: 20,
-            bottom: (MediaQuery.of(context).padding.bottom > 0
-                    ? MediaQuery.of(context).padding.bottom + 8
-                    : 16) +
-                72,
-            child: const UniversalQuickAddFab(),
-          ),
-
-          // 3. Custom floating bottom navigation bar
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: FormaFloatingNavBar(
-              currentIndex: widget.navigationShell.currentIndex,
-              onTap: (index) {
-                if (index != widget.navigationShell.currentIndex) {
-                  HapticFeedback.lightImpact();
-                  widget.navigationShell.goBranch(
-                    index,
-                    initialLocation:
-                        index == widget.navigationShell.currentIndex,
-                  );
-                }
-              },
+    return PopScope(
+      canPop: navigationShell.currentIndex == 0,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        if (navigationShell.currentIndex != 0) {
+          HapticFeedback.lightImpact();
+          navigationShell.goBranch(0);
+        }
+      },
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        body: Stack(
+          children: [
+            // 1. Core Shell Content (preserves full scroll & widget state across tabs)
+            Positioned.fill(
+              child: navigationShell,
             ),
-          ),
-        ],
+
+            // 2. Universal Quick-Add FAB
+            Positioned(
+              right: 20,
+              bottom: (MediaQuery.of(context).padding.bottom > 0
+                      ? MediaQuery.of(context).padding.bottom + 8
+                      : 16) +
+                  72,
+              child: const UniversalQuickAddFab(),
+            ),
+
+            // 3. Custom floating bottom navigation bar
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: FormaFloatingNavBar(
+                currentIndex: navigationShell.currentIndex,
+                onTap: (index) {
+                  if (index != navigationShell.currentIndex) {
+                    HapticFeedback.lightImpact();
+                    navigationShell.goBranch(
+                      index,
+                      initialLocation: index == navigationShell.currentIndex,
+                    );
+                  }
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -1,0 +1,15 @@
+# FORMA Android Release Signing Properties Template
+# ----------------------------------------------------
+# 1. Generate your permanent release keystore:
+#    keytool -genkey -v -keystore android/forma-release.jks -keyalg RSA -keysize 2048 -validity 10000 -alias forma-release-key
+#
+# 2. Copy this template to 'android/key.properties':
+#    cp android/key.properties.example android/key.properties
+#
+# 3. Fill in your passwords and file path below:
+#    (Note: android/key.properties is strictly git-ignored and must NEVER be committed)
+
+storeFile=forma-release.jks
+storePassword=YOUR_KEYSTORE_PASSWORD
+keyAlias=forma-release-key
+keyPassword=YOUR_KEY_PASSWORD

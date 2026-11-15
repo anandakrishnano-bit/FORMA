@@ -134,6 +134,9 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
 
     try {
       final googleSignIn = GoogleSignIn(scopes: ['email', 'profile']);
+      try {
+        await googleSignIn.signOut();
+      } catch (_) {}
       final googleUser = await googleSignIn.signIn();
       if (googleUser == null) {
         setState(() => _isLoading = false);

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // ─────────────────────── Firebase Instance Providers ───────────────────────
@@ -37,6 +38,8 @@ class UserModel {
   final String? photoUrl;
   final String? bio;
   final bool onboardingComplete;
+  final String? termsAcceptedVersion;
+  final DateTime? termsAcceptedAt;
   final Map<String, dynamic>? preferences;
   final Map<String, dynamic>? trainingPreferences;
   final List<String>? habits;
@@ -49,6 +52,8 @@ class UserModel {
     this.photoUrl,
     this.bio,
     this.onboardingComplete = false,
+    this.termsAcceptedVersion,
+    this.termsAcceptedAt,
     this.preferences,
     this.trainingPreferences,
     this.habits,
@@ -70,6 +75,8 @@ class UserModel {
       onboardingComplete: (data['onboardingComplete'] as bool?) ??
           (data['onboardingCompleted'] as bool?) ??
           false,
+      termsAcceptedVersion: data['termsAcceptedVersion'] as String?,
+      termsAcceptedAt: (data['termsAcceptedAt'] as Timestamp?)?.toDate(),
       preferences: data['preferences'] as Map<String, dynamic>?,
       trainingPreferences: data['trainingPreferences'] as Map<String, dynamic>?,
       habits: (data['habits'] as List<dynamic>?)?.cast<String>(),
@@ -86,6 +93,10 @@ class UserModel {
       'avatarUrl': photoUrl,
       'bio': bio,
       'onboardingComplete': onboardingComplete,
+      if (termsAcceptedVersion != null)
+        'termsAcceptedVersion': termsAcceptedVersion,
+      if (termsAcceptedAt != null)
+        'termsAcceptedAt': Timestamp.fromDate(termsAcceptedAt!),
       'preferences': preferences,
       'trainingPreferences': trainingPreferences,
       'habits': habits,
@@ -98,6 +109,8 @@ class UserModel {
     String? photoUrl,
     String? bio,
     bool? onboardingComplete,
+    String? termsAcceptedVersion,
+    DateTime? termsAcceptedAt,
     Map<String, dynamic>? preferences,
     Map<String, dynamic>? trainingPreferences,
     List<String>? habits,
@@ -109,6 +122,8 @@ class UserModel {
       photoUrl: photoUrl ?? this.photoUrl,
       bio: bio ?? this.bio,
       onboardingComplete: onboardingComplete ?? this.onboardingComplete,
+      termsAcceptedVersion: termsAcceptedVersion ?? this.termsAcceptedVersion,
+      termsAcceptedAt: termsAcceptedAt ?? this.termsAcceptedAt,
       preferences: preferences ?? this.preferences,
       trainingPreferences: trainingPreferences ?? this.trainingPreferences,
       habits: habits ?? this.habits,
@@ -201,6 +216,9 @@ class AuthRepository {
 
   /// Signs out the current user.
   Future<void> signOut() async {
+    try {
+      await GoogleSignIn().signOut();
+    } catch (_) {}
     await _auth.signOut();
   }
 
@@ -222,6 +240,18 @@ class AuthRepository {
     await _firestore.collection('users').doc(uid).update({
       'onboardingComplete': true,
     });
+  }
+
+  /// Records acceptance of the legal Terms and Conditions in Firestore.
+  /// Never stores credentials alongside this record.
+  Future<void> acceptTerms({
+    required String uid,
+    required String version,
+  }) async {
+    await _firestore.collection('users').doc(uid).set({
+      'termsAcceptedVersion': version,
+      'termsAcceptedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
   }
 }
 

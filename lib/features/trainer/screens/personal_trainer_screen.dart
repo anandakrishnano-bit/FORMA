@@ -60,14 +60,31 @@ class _PersonalTrainerScreenState extends ConsumerState<PersonalTrainerScreen> {
       }
     });
 
-    return Scaffold(
-      backgroundColor:
-          isDark ? FormaColors.darkBackground : FormaColors.lightBackground,
-      appBar: AppBar(
-        title: const Text(
-          'Personal Trainer',
-          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18),
-        ),
+    return PopScope(
+      canPop: context.canPop(),
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) return;
+        context.go('/home');
+      },
+      child: Scaffold(
+        backgroundColor:
+            isDark ? FormaColors.darkBackground : FormaColors.lightBackground,
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_rounded),
+            tooltip: 'Back to Home',
+            onPressed: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go('/home');
+              }
+            },
+          ),
+          title: const Text(
+            'Personal Trainer',
+            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18),
+          ),
         centerTitle: false,
         actions: [
           IconButton(
@@ -230,10 +247,11 @@ class _PersonalTrainerScreenState extends ConsumerState<PersonalTrainerScreen> {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
-  Widget _buildMessageBubble(TrainerMessage msg, bool isUser, bool isDark) {
+Widget _buildMessageBubble(TrainerMessage msg, bool isUser, bool isDark) {
     return Align(
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(

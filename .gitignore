@@ -45,20 +45,30 @@ FORMA-debug.apk
 **/android/local.properties
 **/android/**/GeneratedPluginRegistrant.java
 
-# Keystores & Signing
+# Keystores, Certificates & Signing
 *.jks
 *.keystore
+*.p12
+*.pfx
+*.pem
+*.cert
+*.der
 key.properties
+**/key.properties
 android/key.properties
 
-# Secrets, API Keys & Environment files
+# Secrets, Service Accounts & Environment files
 *.env
 *.env.*
 .env
 .env.*
 !.env.example
+*service-account*.json
+*serviceAccount*.json
 
 # Local IDE & AI Tooling caches
 .claude/
 .gemini/
 .jolli/
+
+docs/images/screenshots/phone_*

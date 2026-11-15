@@ -126,7 +126,7 @@ class _DeveloperSetupDiagnosticsScreenState
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Genuine connectivity tests for Firebase Authentication, Cloud Firestore, Android Keystore, SQLite, and Gemini 1.5 Flash AI.',
+                          'Genuine connectivity tests for Firebase Authentication, Cloud Firestore, Android Keystore, SQLite, and Gemini 2.0 Flash AI.',
                           style: TextStyle(
                             fontSize: 12,
                             color: isDark

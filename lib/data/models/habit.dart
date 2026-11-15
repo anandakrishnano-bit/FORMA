@@ -45,6 +45,7 @@ class Habit {
   final int streakCount;
 
   String get title => name;
+  String get category => frequency.displayName;
 
   Habit({
     required this.id,

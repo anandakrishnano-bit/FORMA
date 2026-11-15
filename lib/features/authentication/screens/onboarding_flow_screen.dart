@@ -13,6 +13,7 @@ import 'package:forma/core/components/forma_text_field.dart';
 import 'package:forma/core/components/forma_loading_overlay.dart';
 import 'package:forma/core/components/forma_logo.dart';
 import 'package:forma/core/theme/app_colors.dart';
+import 'package:forma/core/legal/terms_data.dart';
 import 'package:forma/data/models/preset_avatar_model.dart';
 import 'package:forma/features/authentication/widgets/country_code_picker.dart';
 import 'package:forma/features/home/repositories/home_customization_repository.dart';
@@ -62,6 +63,7 @@ class _OnboardingFlowScreenState extends ConsumerState<OnboardingFlowScreen> {
   Timer? _cooldownTimer;
   CountryInfo _selectedCountry = CountryInfo.defaultCountry;
   bool _obscurePassword = true;
+  bool _termsAccepted = false;
 
   @override
   void initState() {
@@ -142,6 +144,10 @@ class _OnboardingFlowScreenState extends ConsumerState<OnboardingFlowScreen> {
 
     try {
       final googleSignIn = GoogleSignIn(scopes: ['email', 'profile']);
+      // Always clear any cached session so the user can choose which Google account to use
+      try {
+        await googleSignIn.signOut();
+      } catch (_) {}
       final googleUser = await googleSignIn.signIn();
 
       if (googleUser == null) {
@@ -184,6 +190,8 @@ class _OnboardingFlowScreenState extends ConsumerState<OnboardingFlowScreen> {
             'An account already exists with this email. Please sign in with your password.';
       } else if (e.code == 'network-request-failed') {
         message = 'Could not connect. Please check your internet connection.';
+      } else {
+        message = e.message ?? message;
       }
       if (mounted) {
         setState(() {
@@ -191,10 +199,20 @@ class _OnboardingFlowScreenState extends ConsumerState<OnboardingFlowScreen> {
           _isLoading = false;
         });
       }
-    } catch (_) {
+    } catch (e) {
+      final errStr = e.toString();
+      String message = 'Could not sign in with Google: $e';
+      if (errStr.contains('ApiException: 10') ||
+          errStr.contains('api_exception: 10') ||
+          errStr.contains('code: 10')) {
+        message =
+            'Google Sign-In configuration error (ApiException: 10). The release SHA-1 certificate fingerprint is not registered in Firebase Console.';
+      } else if (errStr.contains('network') || errStr.contains('SocketException')) {
+        message = 'Could not connect. Please check your internet connection.';
+      }
       if (mounted) {
         setState(() {
-          _errorMessage = 'Could not sign in with Google. Please try again.';
+          _errorMessage = message;
           _isLoading = false;
         });
       }
@@ -217,6 +235,11 @@ class _OnboardingFlowScreenState extends ConsumerState<OnboardingFlowScreen> {
     }
     if (password.length < 6) {
       setState(() => _errorMessage = 'Password must be at least 6 characters.');
+      return;
+    }
+    if (!_termsAccepted) {
+      setState(() => _errorMessage =
+          'Please read and agree to the Terms and Conditions to continue.');
       return;
     }
 
@@ -255,8 +278,12 @@ class _OnboardingFlowScreenState extends ConsumerState<OnboardingFlowScreen> {
         case 'network-request-failed':
           message = 'Could not connect. Please check your internet connection.';
           break;
-        default:
+        case 'operation-not-allowed':
           message =
+              'Email/Password sign-in is disabled in Firebase Console. Please enable Email/Password under Authentication > Sign-in method in Firebase Console.';
+          break;
+        default:
+          message = e.message ??
               'We could not create your account. Please check your details.';
       }
       if (mounted) {
@@ -265,11 +292,11 @@ class _OnboardingFlowScreenState extends ConsumerState<OnboardingFlowScreen> {
           _isLoading = false;
         });
       }
-    } catch (_) {
+    } catch (e) {
       if (mounted) {
         setState(() {
           _errorMessage =
-              'An error occurred while creating your account. Please try again.';
+              'An error occurred while creating your account: ${e.toString()}';
           _isLoading = false;
         });
       }
@@ -413,6 +440,8 @@ class _OnboardingFlowScreenState extends ConsumerState<OnboardingFlowScreen> {
         'updatedAt': FieldValue.serverTimestamp(),
         'onboardingComplete': true,
         'onboardingCompleted': true,
+        'termsAcceptedVersion': FormaTermsData.currentVersion,
+        'termsAcceptedAt': FieldValue.serverTimestamp(),
         'accountStatus': 'active',
         'preferences': {
           'focusAreas': focusList,
@@ -886,6 +915,62 @@ class _OnboardingFlowScreenState extends ConsumerState<OnboardingFlowScreen> {
                         onPressed: () => setState(
                             () => _obscurePassword = !_obscurePassword),
                       ),
+                    ),
+                    const SizedBox(height: 14),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: Checkbox(
+                            value: _termsAccepted,
+                            onChanged: (val) =>
+                                setState(() => _termsAccepted = val ?? false),
+                            activeColor: FormaColors.primaryAccent,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () => setState(
+                                () => _termsAccepted = !_termsAccepted),
+                            child: Text.rich(
+                              TextSpan(
+                                text: 'I agree to the ',
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: secondaryTextColor,
+                                  height: 1.4,
+                                ),
+                                children: [
+                                  WidgetSpan(
+                                    alignment: PlaceholderAlignment.baseline,
+                                    baseline: TextBaseline.alphabetic,
+                                    child: GestureDetector(
+                                      onTap: () =>
+                                          context.push('/terms-and-conditions'),
+                                      child: const Text(
+                                        'Terms and Conditions',
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w700,
+                                          color: FormaColors.primaryAccent,
+                                          decoration: TextDecoration.underline,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const TextSpan(text: ' of FORMA.'),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 16),
                     FormaButton(

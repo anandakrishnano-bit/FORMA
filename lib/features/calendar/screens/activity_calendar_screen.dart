@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:forma/core/theme/app_colors.dart';
 import 'package:forma/data/models/daily_summary_model.dart';
@@ -82,16 +83,33 @@ class _ActivityCalendarScreenState
     final expenses = expensesAsync.valueOrNull ?? [];
     final summaries = recentSummariesAsync.valueOrNull ?? [];
 
-    return Scaffold(
-      backgroundColor:
-          isDark ? FormaColors.darkBackground : FormaColors.lightBackground,
-      appBar: AppBar(
-        title: Text(
-          'Activity Calendar',
-          style: GoogleFonts.plusJakartaSans(
-              fontWeight: FontWeight.w800, fontSize: 18),
-        ),
-        actions: [
+    return PopScope(
+      canPop: context.canPop(),
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) return;
+        context.go('/home');
+      },
+      child: Scaffold(
+        backgroundColor:
+            isDark ? FormaColors.darkBackground : FormaColors.lightBackground,
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_rounded),
+            tooltip: 'Back to Home',
+            onPressed: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go('/home');
+              }
+            },
+          ),
+          title: Text(
+            'Activity Calendar',
+            style: GoogleFonts.plusJakartaSans(
+                fontWeight: FontWeight.w800, fontSize: 18),
+          ),
+          actions: [
           TextButton.icon(
             onPressed: _goToToday,
             icon: const Icon(Icons.today_rounded,
@@ -173,10 +191,11 @@ class _ActivityCalendarScreenState
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
-  Widget _buildMonthHeader(bool isDark) {
+Widget _buildMonthHeader(bool isDark) {
     final title = DateFormat('MMMM yyyy').format(_displayedMonth);
 
     return Row(

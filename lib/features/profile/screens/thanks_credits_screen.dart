@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:forma/core/theme/app_colors.dart';
 import 'package:forma/core/components/forma_logo.dart';
@@ -34,18 +35,30 @@ class ThanksCreditsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Scaffold(
-      backgroundColor:
-          isDark ? FormaColors.darkBackground : FormaColors.lightBackground,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_rounded,
-              color: isDark ? Colors.white : FormaColors.charcoal),
-          onPressed: () => Navigator.of(context).pop(),
+    return PopScope(
+      canPop: context.canPop(),
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) return;
+        context.go('/home');
+      },
+      child: Scaffold(
+        backgroundColor:
+            isDark ? FormaColors.darkBackground : FormaColors.lightBackground,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back_rounded,
+                color: isDark ? Colors.white : FormaColors.charcoal),
+            onPressed: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go('/home');
+              }
+            },
+          ),
         ),
-      ),
       body: SafeArea(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
@@ -304,10 +317,11 @@ class ThanksCreditsScreen extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
-  Widget _buildSocialRow({
+Widget _buildSocialRow({
     required BuildContext context,
     required String platformName,
     required String handle,

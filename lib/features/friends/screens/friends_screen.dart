@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:forma/core/components/forma_avatar.dart';
 import 'package:forma/core/components/forma_bounceable.dart';
@@ -170,14 +171,31 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
 
     final incomingCount = incomingRequestsAsync.valueOrNull?.length ?? 0;
 
-    return Scaffold(
-      backgroundColor:
-          isDark ? FormaColors.darkBackground : FormaColors.lightBackground,
-      appBar: AppBar(
-        title: const Text('Friends & Social',
-            style: TextStyle(fontWeight: FontWeight.w800)),
-        centerTitle: false,
-      ),
+    return PopScope(
+      canPop: context.canPop(),
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) return;
+        context.go('/home');
+      },
+      child: Scaffold(
+        backgroundColor:
+            isDark ? FormaColors.darkBackground : FormaColors.lightBackground,
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_rounded),
+            tooltip: 'Back to Home',
+            onPressed: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go('/home');
+              }
+            },
+          ),
+          title: const Text('Friends & Social',
+              style: TextStyle(fontWeight: FontWeight.w800)),
+          centerTitle: false,
+        ),
       body: SafeArea(
         child: Column(
           children: [
@@ -258,10 +276,11 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen> {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
-  Widget _buildSegmentButton({
+Widget _buildSegmentButton({
     required int index,
     required String label,
     required int badgeCount,

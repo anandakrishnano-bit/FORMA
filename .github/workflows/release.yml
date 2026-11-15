@@ -1,0 +1,194 @@
+name: FORMA Public Release Automation
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (e.g. v1.1.0, leave empty to use current ref)'
+        required: false
+        type: string
+        default: ''
+      is_draft:
+        description: 'Publish as draft release'
+        required: false
+        type: boolean
+        default: false
+      is_prerelease:
+        description: 'Publish as prerelease'
+        required: false
+        type: boolean
+        default: false
+      priority:
+        description: 'Update Priority (normal, important, critical)'
+        required: false
+        type: choice
+        options:
+          - normal
+          - important
+          - critical
+        default: 'normal'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    name: Build & Publish Release APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Verify Flutter Installation
+        run: flutter --version
+
+      - name: Install Dependencies
+        run: flutter pub get
+
+      - name: Run Static Analysis
+        run: flutter analyze --no-fatal-infos
+
+      - name: Run Unit Tests
+        run: flutter test
+
+      - name: Determine Version & Tag
+        id: vars
+        run: |
+          if [ -n "${{ github.event.inputs.tag }}" ]; then
+            TAG_NAME="${{ github.event.inputs.tag }}"
+          elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            TAG_NAME="${GITHUB_REF#refs/tags/}"
+          else
+            VERSION_FROM_PUBSPEC=$(grep '^version:' pubspec.yaml | sed 's/version: //')
+            TAG_NAME="v${VERSION_FROM_PUBSPEC%+*}"
+          fi
+          
+          # Clean version string (e.g., 1.1.0)
+          CLEAN_VER="${TAG_NAME#v}"
+          
+          # Read build number from pubspec
+          PUBSPEC_FULL=$(grep '^version:' pubspec.yaml | sed 's/version: //')
+          BUILD_CODE="${PUBSPEC_FULL#*+}"
+          if [ "$BUILD_CODE" = "$PUBSPEC_FULL" ]; then
+            BUILD_CODE="1"
+          fi
+
+          echo "TAG_NAME=$TAG_NAME" >> $GITHUB_OUTPUT
+          echo "CLEAN_VER=$CLEAN_VER" >> $GITHUB_OUTPUT
+          echo "BUILD_CODE=$BUILD_CODE" >> $GITHUB_OUTPUT
+
+      - name: Configure Production Signing Keystore
+        run: |
+          if [ -n "${{ secrets.FORMA_KEYSTORE_BASE64 }}" ]; then
+            echo "Decoding permanent release keystore from GitHub Secrets..."
+            echo "${{ secrets.FORMA_KEYSTORE_BASE64 }}" | base64 --decode > android/forma-release.jks
+            cat <<EOF > android/key.properties
+          storeFile=forma-release.jks
+          storePassword=${{ secrets.FORMA_STORE_PASSWORD }}
+          keyAlias=${{ secrets.FORMA_KEY_ALIAS }}
+          keyPassword=${{ secrets.FORMA_KEY_PASSWORD }}
+          EOF
+            echo "Release signing credentials configured successfully."
+          else
+            echo "::error::GitHub Secret FORMA_KEYSTORE_BASE64 is not set! Release builds fail explicitly because debug fallback is disabled."
+            exit 1
+          fi
+
+      - name: Build Android Release APK
+        run: |
+          flutter build apk --release --no-tree-shake-icons --build-name=${{ steps.vars.outputs.CLEAN_VER }} --build-number=${{ steps.vars.outputs.BUILD_CODE }}
+
+      - name: Secure Cleanup of Signing Secrets
+        if: always()
+        run: |
+          rm -f android/key.properties
+          rm -f android/forma-release.jks
+
+      - name: Package & Prepare Release Assets
+        id: package
+        run: |
+          mkdir -p release_dist
+          
+          SRC_APK="build/app/outputs/flutter-apk/app-release.apk"
+          DEST_APK="release_dist/forma-${{ steps.vars.outputs.TAG_NAME }}.apk"
+          
+          cp "$SRC_APK" "$DEST_APK"
+          
+          # Compute SHA-256 Checksum
+          cd release_dist
+          sha256sum "forma-${{ steps.vars.outputs.TAG_NAME }}.apk" > "forma-${{ steps.vars.outputs.TAG_NAME }}.apk.sha256"
+          SHA_VALUE=$(cat "forma-${{ steps.vars.outputs.TAG_NAME }}.apk.sha256" | awk '{print $1}')
+          cd ..
+          
+          PRIORITY="${{ github.event.inputs.priority || 'normal' }}"
+          
+          # Generate structured release-metadata.json for FORMA in-app update client
+          cat <<EOF > release_dist/release-metadata.json
+          {
+            "version": "${{ steps.vars.outputs.CLEAN_VER }}",
+            "versionCode": ${{ steps.vars.outputs.BUILD_CODE }},
+            "tagName": "${{ steps.vars.outputs.TAG_NAME }}",
+            "priority": "$PRIORITY",
+            "minSupportedVersion": "1.0.0",
+            "apkFileName": "forma-${{ steps.vars.outputs.TAG_NAME }}.apk",
+            "sha256": "$SHA_VALUE",
+            "publishedAt": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          }
+          EOF
+          
+          echo "SHA_VALUE=$SHA_VALUE" >> $GITHUB_OUTPUT
+
+      - name: Generate Changelog Notes
+        id: notes
+        run: |
+          cat <<EOF > release_dist/CHANGELOG.md
+          ## What's Changed in FORMA ${{ steps.vars.outputs.TAG_NAME }}
+
+          ### Highlights & Features
+          - Complete GitHub-based in-app update experience with real-time download tracking.
+          - Streamlined hardware and gesture navigation across the entire application.
+          - Interactive Split Expense Settlement modal with live member selection.
+          - Enhanced Google Sign-In with dedicated account selection.
+          
+          ### Verification
+          - **File:** \`forma-${{ steps.vars.outputs.TAG_NAME }}.apk\`
+          - **SHA-256:** \`${{ steps.package.outputs.SHA_VALUE }}\`
+          
+          ---
+          *Built automatically with FORMA CI/CD pipeline.*
+          EOF
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.vars.outputs.TAG_NAME }}
+          name: "FORMA ${{ steps.vars.outputs.TAG_NAME }}"
+          body_path: release_dist/CHANGELOG.md
+          draft: ${{ github.event.inputs.is_draft || false }}
+          prerelease: ${{ github.event.inputs.is_prerelease || false }}
+          files: |
+            release_dist/forma-${{ steps.vars.outputs.TAG_NAME }}.apk
+            release_dist/forma-${{ steps.vars.outputs.TAG_NAME }}.apk.sha256
+            release_dist/release-metadata.json
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

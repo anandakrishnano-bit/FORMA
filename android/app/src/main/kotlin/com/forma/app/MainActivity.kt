@@ -7,21 +7,26 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.SystemClock
+import android.provider.Settings
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.FileProvider
 import com.forma.app.widgets.BudgetWidgetProvider
 import com.forma.app.widgets.DailyActivityWidgetProvider
 import com.forma.app.widgets.WorkoutWidgetProvider
 import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
+import java.io.File
 
 class MainActivity: FlutterFragmentActivity() {
     private val LIVE_UPDATES_CHANNEL = "com.forma.app/live_updates"
     private val WIDGETS_CHANNEL = "com.forma.app/home_widgets"
     private val APP_ICON_CHANNEL = "com.forma.app/app_icon"
+    private val APP_UPDATE_CHANNEL = "com.forma.app/app_update"
 
     private val NOTIFICATION_ID = 1001
     private val CHANNEL_ID = "forma_live_workout"
@@ -136,6 +141,90 @@ class MainActivity: FlutterFragmentActivity() {
                 "getCurrentAppIcon" -> {
                     val current = getCurrentAppIcon()
                     result.success(current)
+                }
+                else -> result.notImplemented()
+            }
+        }
+
+        // 4. Android In-App APK Update Channel
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, APP_UPDATE_CHANNEL).setMethodCallHandler { call, result ->
+            when (call.method) {
+                "getInstalledVersionInfo" -> {
+                    try {
+                        val pInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            packageManager.getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(0))
+                        } else {
+                            @Suppress("DEPRECATION")
+                            packageManager.getPackageInfo(packageName, 0)
+                        }
+                        val longVersionCode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                            pInfo.longVersionCode
+                        } else {
+                            @Suppress("DEPRECATION")
+                            pInfo.versionCode.toLong()
+                        }
+                        result.success(mapOf(
+                            "versionName" to (pInfo.versionName ?: "1.0.0"),
+                            "versionCode" to longVersionCode,
+                            "firstInstallTime" to pInfo.firstInstallTime,
+                            "lastUpdateTime" to pInfo.lastUpdateTime
+                        ))
+                    } catch (e: Exception) {
+                        result.error("VERSION_ERROR", e.localizedMessage, null)
+                    }
+                }
+                "canRequestPackageInstalls" -> {
+                    val canInstall = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        packageManager.canRequestPackageInstalls()
+                    } else {
+                        true
+                    }
+                    result.success(canInstall)
+                }
+                "openInstallPermissionSettings" -> {
+                    try {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            val intent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES).apply {
+                                data = Uri.parse("package:$packageName")
+                                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            }
+                            startActivity(intent)
+                            result.success(true)
+                        } else {
+                            result.success(true)
+                        }
+                    } catch (e: Exception) {
+                        result.error("SETTINGS_ERROR", e.localizedMessage, null)
+                    }
+                }
+                "installApk" -> {
+                    val filePath = call.argument<String>("filePath")
+                    if (filePath.isNullOrEmpty()) {
+                        result.error("INVALID_PATH", "File path cannot be empty", null)
+                        return@setMethodCallHandler
+                    }
+                    val file = File(filePath)
+                    if (!file.exists()) {
+                        result.error("FILE_NOT_FOUND", "APK file does not exist at $filePath", null)
+                        return@setMethodCallHandler
+                    }
+
+                    try {
+                        val apkUri: Uri = FileProvider.getUriForFile(
+                            this,
+                            "$packageName.fileprovider",
+                            file
+                        )
+                        val intent = Intent(Intent.ACTION_VIEW).apply {
+                            setDataAndType(apkUri, "application/vnd.android.package-archive")
+                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        }
+                        startActivity(intent)
+                        result.success(true)
+                    } catch (e: Exception) {
+                        result.error("INSTALL_ERROR", e.localizedMessage, null)
+                    }
                 }
                 else -> result.notImplemented()
             }

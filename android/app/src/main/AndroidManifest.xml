@@ -29,6 +29,8 @@
     <uses-permission android:name="android.permission.health.READ_EXERCISE"/>
     <uses-permission android:name="android.permission.health.READ_SLEEP"/>
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
+    <!-- Android Package Installation Permission for GitHub In-App Updates -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <!-- Queries for Google Health Connect package discovery -->
     <queries>
@@ -207,6 +209,17 @@
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
             </intent-filter>
         </receiver>
+
+        <!-- Secure FileProvider for App Update APK Installation -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/forma_file_paths" />
+        </provider>
 
         <meta-data
             android:name="flutterEmbedding"

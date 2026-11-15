@@ -121,7 +121,7 @@ class _QuickAddActionSheet extends StatelessWidget {
         iconColor: FormaColors.goldenYellow,
         onTap: () {
           Navigator.of(context).pop();
-          context.push('/nutrition');
+          context.go('/nutrition');
         },
       ),
       _QuickAction(
@@ -131,7 +131,7 @@ class _QuickAddActionSheet extends StatelessWidget {
         iconColor: FormaColors.secondaryAccent,
         onTap: () {
           Navigator.of(context).pop();
-          context.push('/habits');
+          context.go('/habits');
         },
       ),
       _QuickAction(

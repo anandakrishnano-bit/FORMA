@@ -30,6 +30,11 @@ import 'package:forma/core/services/daily_summary_service.dart';
 import 'package:forma/features/home/widgets/daily_energy_rings_widget.dart';
 import 'package:forma/features/home/widgets/compact_weekly_muscle_widget.dart';
 import 'package:forma/features/home/repositories/home_customization_repository.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:forma/core/legal/terms_data.dart';
+import 'package:forma/core/updates/models/update_check_result.dart';
+import 'package:forma/core/updates/services/app_update_manager.dart';
+import 'package:forma/core/updates/widgets/forma_update_screen.dart';
 
 /// Inspiring Home Screen (Reference Image 2 Fidelity)
 ///
@@ -53,6 +58,206 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   void initState() {
     super.initState();
     _checkRecovery();
+    _checkForUpdates();
+    _checkTermsAcceptance();
+  }
+
+  Future<void> _checkTermsAcceptance() async {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+      try {
+        final user = FirebaseAuth.instance.currentUser;
+        if (user == null) return;
+        final doc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .get();
+        if (!doc.exists || !mounted) return;
+        final acceptedVersion = doc.data()?['termsAcceptedVersion'] as String?;
+        if (FormaTermsData.isAcceptanceRequired(acceptedVersion)) {
+          if (mounted) {
+            _showTermsUpdateSheet(context, user.uid);
+          }
+        }
+      } catch (_) {
+        // Offline or rules latency - never block the user from using the app!
+      }
+    });
+  }
+
+  void _showTermsUpdateSheet(BuildContext context, String uid) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    showModalBottomSheet(
+      context: context,
+      isDismissible: true,
+      enableDrag: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        return Container(
+          decoration: BoxDecoration(
+            color: isDark ? FormaColors.charcoal : Colors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.3),
+                blurRadius: 20,
+                offset: const Offset(0, -4),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: isDark ? Colors.white24 : Colors.black12,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 18),
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: FormaColors.primaryAccent.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(Icons.gavel_rounded,
+                        color: FormaColors.primaryAccent, size: 22),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Updated Terms & Conditions',
+                          style: TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w800,
+                            color: isDark ? Colors.white : FormaColors.charcoal,
+                          ),
+                        ),
+                        Text(
+                          'Version ${FormaTermsData.currentVersion}',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: isDark
+                                ? FormaColors.darkSecondaryText
+                                : FormaColors.lightSecondaryText,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              Text(
+                'We have updated the FORMA Terms and Conditions. Please review the updated terms to stay informed about your rights, privacy, and responsibilities.',
+                style: TextStyle(
+                  fontSize: 13,
+                  height: 1.4,
+                  color: isDark
+                      ? FormaColors.darkSecondaryText
+                      : FormaColors.lightSecondaryText,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        side: BorderSide(
+                          color: isDark ? Colors.white24 : Colors.black26,
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.of(ctx).pop();
+                        context.push('/terms-and-conditions');
+                      },
+                      child: Text(
+                        'Review Terms',
+                        style: TextStyle(
+                          color: isDark ? Colors.white : FormaColors.charcoal,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        backgroundColor: FormaColors.primaryAccent,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                      onPressed: () async {
+                        try {
+                          await ref
+                              .read(authRepositoryProvider)
+                              .acceptTerms(
+                                uid: uid,
+                                version: FormaTermsData.currentVersion,
+                              );
+                        } catch (_) {}
+                        if (ctx.mounted) {
+                          Navigator.of(ctx).pop();
+                        }
+                      },
+                      child: const Text(
+                        'Agree & Continue',
+                        style: TextStyle(
+                          color: FormaColors.charcoal,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _checkForUpdates() async {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+      try {
+        final updateNotifier = ref.read(updateCheckStateProvider.notifier);
+        final result = await updateNotifier.checkForUpdates(force: false);
+        if (!mounted) return;
+        if (result.status == UpdateStatus.updateAvailable &&
+            result.latestRelease != null) {
+          final isDismissed = await updateNotifier
+              .isVersionDismissed(result.latestRelease!.tagName);
+          if (!isDismissed || result.isCritical) {
+            if (mounted) {
+              FormaUpdateScreen.show(context, result.latestRelease!);
+            }
+          }
+        }
+      } catch (_) {}
+    });
   }
 
   Future<void> _checkRecovery() async {
@@ -119,7 +324,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final userProfile = userProfileAsync.valueOrNull;
 
     final rawName = userProfile?.displayName ?? user?.displayName ?? 'Athlete';
-    final userName = rawName
+    final cleaned = rawName
         .replaceAll(
           RegExp(
             r'[\u{10000}-\u{10FFFF}]|[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]',
@@ -128,6 +333,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           '',
         )
         .trim();
+    final userName = cleaned.isNotEmpty ? cleaned : 'Athlete';
     final photoUrl = userProfile?.photoUrl ??
         userProfile?.photoURL ??
         userProfile?.avatarUrl ??
@@ -179,7 +385,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(
                 parent: BouncingScrollPhysics()),
-            padding: const EdgeInsets.only(bottom: 120),
+            padding: const EdgeInsets.only(bottom: 180),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -257,7 +463,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           const SizedBox(width: 10),
                           // User profile circular avatar
                           GestureDetector(
-                            onTap: () => context.go('/profile'),
+                            onTap: () => context.push('/profile'),
                             child: FormaAvatar(
                               photoUrl: photoUrl,
                               name: userName,
@@ -623,7 +829,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             children: [
               Expanded(
                 child: GestureDetector(
-                  onTap: () => context.push('/expenses'),
+                  onTap: () => context.go('/expenses'),
                   child: Container(
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(

@@ -38,7 +38,8 @@ class AsymmetricFeatureHero extends StatelessWidget {
 
     final waterFraction = (waterMl / targetWaterMl).clamp(0.0, 1.0);
 
-    return IntrinsicHeight(
+    return SizedBox(
+      height: 232,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -59,7 +60,8 @@ class AsymmetricFeatureHero extends StatelessWidget {
               ),
               closedBuilder: (context, openContainer) {
                 return Container(
-                  padding: const EdgeInsets.all(22),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                   decoration: BoxDecoration(
                     color: FormaColors.goldenYellow,
                     borderRadius: BorderRadius.circular(28),
@@ -97,11 +99,11 @@ class AsymmetricFeatureHero extends StatelessWidget {
                               ),
                             ),
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 10),
                           Text(
                             routine.name,
                             style: const TextStyle(
-                              fontSize: 22,
+                              fontSize: 20,
                               fontWeight: FontWeight.w800,
                               height: 1.15,
                               letterSpacing: -0.4,
@@ -110,11 +112,11 @@ class AsymmetricFeatureHero extends StatelessWidget {
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
-                          const SizedBox(height: 6),
+                          const SizedBox(height: 4),
                           Text(
                             '${routine.estimatedMinutes} min • ${routine.targetMuscleGroups.take(2).join(', ')}',
                             style: TextStyle(
-                              fontSize: 13,
+                              fontSize: 12,
                               fontWeight: FontWeight.w600,
                               color:
                                   FormaColors.charcoal.withValues(alpha: 0.75),
@@ -122,12 +124,12 @@ class AsymmetricFeatureHero extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 10),
                       Row(
                         children: [
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 10),
+                                horizontal: 14, vertical: 8),
                             decoration: BoxDecoration(
                               color: FormaColors.charcoal,
                               borderRadius: BorderRadius.circular(20),
@@ -136,14 +138,14 @@ class AsymmetricFeatureHero extends StatelessWidget {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(Icons.play_arrow_rounded,
-                                    color: Colors.white, size: 18),
-                                SizedBox(width: 6),
+                                    color: Colors.white, size: 16),
+                                SizedBox(width: 4),
                                 Text(
                                   'Start',
                                   style: TextStyle(
                                     color: Colors.white,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w700,
+                                    fontWeight: FontWeight.w800,
+                                    fontSize: 12,
                                   ),
                                 ),
                               ],

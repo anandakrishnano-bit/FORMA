@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:go_router/go_router.dart';
 import 'package:forma/core/theme/app_colors.dart';
 import 'package:forma/features/home/models/home_card_config.dart';
 import 'package:forma/features/home/repositories/home_customization_repository.dart';
@@ -19,16 +20,33 @@ class CustomizeHomeScreen extends ConsumerWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final cards = ref.watch(homeCardConfigsProvider);
 
-    return Scaffold(
-      backgroundColor:
-          isDark ? FormaColors.darkBackground : FormaColors.lightBackground,
-      appBar: AppBar(
-        title: Text(
-          'Customize Home',
-          style: GoogleFonts.plusJakartaSans(
-              fontWeight: FontWeight.w800, fontSize: 18),
-        ),
-        actions: [
+    return PopScope(
+      canPop: context.canPop(),
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) return;
+        context.go('/home');
+      },
+      child: Scaffold(
+        backgroundColor:
+            isDark ? FormaColors.darkBackground : FormaColors.lightBackground,
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_rounded),
+            tooltip: 'Back to Home',
+            onPressed: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go('/home');
+              }
+            },
+          ),
+          title: Text(
+            'Customize Home',
+            style: GoogleFonts.plusJakartaSans(
+                fontWeight: FontWeight.w800, fontSize: 18),
+          ),
+          actions: [
           TextButton(
             onPressed: () async {
               HapticFeedback.mediumImpact();
@@ -115,10 +133,11 @@ class CustomizeHomeScreen extends ConsumerWidget {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
-  Widget _buildCardItem({
+Widget _buildCardItem({
     required Key key,
     required HomeCardConfig card,
     required bool isDark,

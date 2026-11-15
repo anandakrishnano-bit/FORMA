@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:forma/core/components/forma_bounceable.dart';
@@ -73,15 +74,32 @@ Tracked with FORMA.
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final reportAsync = ref.watch(currentWeeklyReportProvider);
 
-    return Scaffold(
-      backgroundColor:
-          isDark ? FormaColors.darkBackground : FormaColors.lightBackground,
-      appBar: AppBar(
-        title: Text(
-          'Your Week in FORMA',
-          style: GoogleFonts.plusJakartaSans(
-              fontWeight: FontWeight.w800, fontSize: 18),
-        ),
+    return PopScope(
+      canPop: context.canPop(),
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) return;
+        context.go('/home');
+      },
+      child: Scaffold(
+        backgroundColor:
+            isDark ? FormaColors.darkBackground : FormaColors.lightBackground,
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_rounded),
+            tooltip: 'Back to Home',
+            onPressed: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go('/home');
+              }
+            },
+          ),
+          title: Text(
+            'Your Week in FORMA',
+            style: GoogleFonts.plusJakartaSans(
+                fontWeight: FontWeight.w800, fontSize: 18),
+          ),
         actions: [
           reportAsync.when(
             data: (report) => IconButton(
@@ -138,10 +156,11 @@ Tracked with FORMA.
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
-  Widget _buildReportContent(WeeklyReport report, bool isDark) {
+Widget _buildReportContent(WeeklyReport report, bool isDark) {
     final rangeStr =
         '${DateFormat('d MMMM').format(report.startDate)} – ${DateFormat('d MMMM yyyy').format(report.endDate)}';
 
@@ -301,7 +320,7 @@ Tracked with FORMA.
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: const Text(
-                          'Gemini 1.5',
+                          'AI Assistant',
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.w700,
