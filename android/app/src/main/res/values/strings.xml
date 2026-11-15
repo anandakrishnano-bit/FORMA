@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FORMA</string>
+    <string name="widget_daily_activity_desc">Daily steps, Energy Score, and workout status</string>
+    <string name="widget_workout_desc">Today\'s planned workout and quick start</string>
+    <string name="widget_budget_desc">Remaining daily allowance and balance</string>
+</resources>

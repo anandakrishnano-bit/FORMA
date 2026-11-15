@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "993961077997",
+    "project_id": "forma-fitness-eafd3",
+    "storage_bucket": "forma-fitness-eafd3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:993961077997:android:3ee4cb6859abeb6b2f70e4",
+        "android_client_info": {
+          "package_name": "com.forma.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "993961077997-gfbd1r7jpfaf249cok2dgj4p8s5he4rm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.forma.app",
+            "certificate_hash": "9a0aa1bd6023c4a7f79d84c0e087f4cf30e0b8b5"
+          }
+        },
+        {
+          "client_id": "993961077997-fo6aesd3qqpqko21pg7aack072pffnqm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAKS3twI7q3M3uzY01LTq3ZNK_bfPckdTs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "993961077997-fo6aesd3qqpqko21pg7aack072pffnqm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

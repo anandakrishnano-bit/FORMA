@@ -1,0 +1,263 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ═══════════════════════════════════════════════════════════════════════
+    // CORE SECURITY FUNCTIONS (DENY ACCESS BY DEFAULT)
+    // ═══════════════════════════════════════════════════════════════════════
+    
+    function isAuthenticated() {
+      return request.auth != null && request.auth.uid != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Validates verified group membership on the server
+    function isGroupMember(groupId) {
+      return isAuthenticated() && 
+        exists(/databases/$(database)/documents/groups/$(groupId)/members/$(request.auth.uid));
+    }
+
+    // Validates group administrator role
+    function isGroupAdmin(groupId) {
+      return isAuthenticated() && 
+        get(/databases/$(database)/documents/groups/$(groupId)/members/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // USERS & STRICT PRIVATE SUBCOLLECTIONS
+    // ═══════════════════════════════════════════════════════════════════════
+
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if isOwner(userId) && (!request.resource.data.keys().hasAny(['role']) || request.resource.data.role == 'user');
+      allow update: if isOwner(userId) 
+        && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['createdAt', 'role', 'uid']));
+      allow delete: if isOwner(userId);
+
+      // Private Habits & Streak History
+      match /habits/{habitId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // Private Custom Workouts
+      match /workouts/{workoutId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // Private Workout Logs (Exercises, sets, volumes)
+      match /workoutHistory/{sessionId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // Private Food Diary (Meals, quantities, timings)
+      match /foodDiary/{entryId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // Private User Preferences & Settings
+      match /preferences/{preferenceId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // Strictly Isolated Personal Trainer Conversations (Private to User)
+      match /trainerConversations/{conversationId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // Private Daily Summaries ("Your day in review")
+      match /dailySummaries/{summaryId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // Private Personal Expenses (Completely isolated, strictly private)
+      match /personalExpenses/{expenseId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // Private Custom Expense Categories
+      match /expenseCategories/{categoryId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // Private Custom Nutrition Portions (Small/Medium/Large/Custom)
+      match /customPortions/{portionId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // Private Muscle Training Logs
+      match /muscleTrainingLogs/{logId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // Private Weekly Muscle Split Plans
+      match /weeklyMusclePlans/{planId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // Private Budget Plans & Fixed Expenses
+      match /budget/{planId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      match /fixedExpenses/{expenseId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // Blocked Users
+      match /blockedUsers/{blockedUid} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // Confirmed Friends subcollection (Mutual access for connected friends)
+      match /friends/{friendId} {
+        allow read: if isOwner(userId) || (isAuthenticated() && request.auth.uid == friendId);
+        allow write: if isOwner(userId) || (isAuthenticated() && request.auth.uid == friendId);
+      }
+
+      // Friend Requests & Invitations
+      match /friendRequests/{requestId} {
+        allow read: if isOwner(userId) || (isAuthenticated() && request.auth.uid == requestId);
+        allow write: if isAuthenticated();
+      }
+
+      // Live Diagnostics Ping
+      match /_diagnostics/{pingId} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // PRIVATE FRIEND GROUPS (STRICT MUTUAL ISOLATION)
+    // ═══════════════════════════════════════════════════════════════════════
+
+    match /groups/{groupId} {
+      allow read: if isGroupMember(groupId);
+      allow create: if isAuthenticated();
+      allow update, delete: if isGroupAdmin(groupId);
+
+      // Group Members Collection
+      match /members/{memberId} {
+        allow read: if isGroupMember(groupId);
+        // Only admins can remove members or change roles; users can leave voluntarily
+        allow write: if isGroupAdmin(groupId) || (isOwner(memberId) && request.resource == null);
+      }
+
+      // Selective Activity Feeds (Append-only by authorized members)
+      match /activity/{activityId} {
+        allow read: if isGroupMember(groupId);
+        allow create: if isGroupMember(groupId) && request.resource.data.userId == request.auth.uid;
+        allow update, delete: if false; // Audit logs are immutable
+      }
+
+      // Shared Habit/Workout Challenges
+      match /challenges/{challengeId} {
+        allow read: if isGroupMember(groupId);
+        allow create, update: if isGroupMember(groupId);
+        allow delete: if isGroupAdmin(groupId);
+      }
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // PERMANENT GLOBAL CATALOGUES (SHARED APPROVED FOODS & EXERCISES)
+    // ═══════════════════════════════════════════════════════════════════════
+
+    match /exercises/{exerciseId} {
+      allow read: if isAuthenticated();
+      // Only trusted server/backend functions can approve permanent exercises
+      allow write: if false; 
+    }
+
+    match /foods/{foodId} {
+      allow read: if isAuthenticated();
+      // Users can submit verified custom entries; backend validates and persists
+      allow create: if isAuthenticated() && request.resource.data.createdBy == request.auth.uid;
+      allow update, delete: if isAuthenticated() && resource.data.createdBy == request.auth.uid;
+    }
+
+    match /assets/{assetId} {
+      allow read: if isAuthenticated();
+      allow write: if false;
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // SHARED EXPENSES & SETTLEMENTS (PARTICIPANT ISOLATION)
+    // ═══════════════════════════════════════════════════════════════════════
+
+    match /sharedExpenses/{expenseId} {
+      // Visible only to creator and selected participants
+      allow read: if isAuthenticated() && (
+        resource.data.createdBy == request.auth.uid ||
+        resource.data.paidBy == request.auth.uid ||
+        request.auth.uid in resource.data.participantIds
+      );
+      allow create: if isAuthenticated() && request.resource.data.createdBy == request.auth.uid;
+      allow update, delete: if isAuthenticated() && resource.data.createdBy == request.auth.uid;
+    }
+
+    match /expenseSettlements/{settlementId} {
+      // Visible only to payer, payee, or creator of the settlement
+      allow read: if isAuthenticated() && (
+        resource.data.payerId == request.auth.uid ||
+        resource.data.payeeId == request.auth.uid ||
+        resource.data.recordedBy == request.auth.uid
+      );
+      allow create: if isAuthenticated() && (
+        request.resource.data.payerId == request.auth.uid ||
+        request.resource.data.payeeId == request.auth.uid ||
+        request.resource.data.recordedBy == request.auth.uid
+      );
+      allow update, delete: if isAuthenticated() && resource.data.recordedBy == request.auth.uid;
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // SOCIAL & FRIENDS SYSTEM (TOP-LEVEL COLLECTIONS)
+    // ═══════════════════════════════════════════════════════════════════════
+
+    // Central Friend Requests
+    match /friendRequests/{requestId} {
+      allow read: if isAuthenticated() && (
+        resource.data.senderId == request.auth.uid ||
+        resource.data.receiverId == request.auth.uid
+      );
+      allow create: if isAuthenticated() && request.resource.data.senderId == request.auth.uid;
+      allow update: if isAuthenticated() && (
+        resource.data.senderId == request.auth.uid ||
+        resource.data.receiverId == request.auth.uid
+      );
+      allow delete: if isAuthenticated() && resource.data.senderId == request.auth.uid;
+    }
+
+    // Central Friendships
+    match /friendships/{friendshipId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+
+    // Public Friend Codes Index
+    match /userFriendCodes/{code} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated();
+    }
+
+    // Milestone Activities
+    match /socialActivities/{activityId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update, delete: if false; // Append-only audit feed
+    }
+
+    // User Violations / Reports
+    match /reports/{reportId} {
+      allow create: if isAuthenticated();
+      allow read, update, delete: if false; // Internal admin review only
+    }
+
+    // Auth Rate Limits (Cloud Functions only)
+    match /authRateLimits/{limitId} {
+      allow read, write: if false;
+    }
+  }
+}
