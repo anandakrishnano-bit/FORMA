@@ -43,7 +43,11 @@ class _AccountConnectionsScreenState extends State<AccountConnectionsScreen> {
   Future<void> _linkGoogle() async {
     setState(() => _isLoading = true);
     try {
-      final googleSignIn = GoogleSignIn(scopes: ['email', 'profile']);
+      final googleSignIn = GoogleSignIn(
+        serverClientId:
+            '993961077997-fo6aesd3qqpqko21pg7aack072pffnqm.apps.googleusercontent.com',
+        scopes: ['email', 'profile'],
+      );
       try {
         await googleSignIn.signOut();
       } catch (_) {}

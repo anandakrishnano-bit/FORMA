@@ -163,7 +163,11 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
-      final googleSignIn = GoogleSignIn(scopes: ['email', 'profile']);
+      final googleSignIn = GoogleSignIn(
+        serverClientId:
+            '993961077997-fo6aesd3qqpqko21pg7aack072pffnqm.apps.googleusercontent.com',
+        scopes: ['email', 'profile'],
+      );
       // Always clear any cached session so the user can choose which Google account to use
       try {
         await googleSignIn.signOut();
